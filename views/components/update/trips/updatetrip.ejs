@@ -1,0 +1,94 @@
+<section class="  bg-cover "
+    style="background-image:linear-gradient(rgba(250, 249, 249, 0.589), rgba(250, 248, 248, 0.61)), url(/assets/loginlayout/1976998.jpg)">
+
+
+    <div class="container mx-auto">
+        <!-- Create Trip and post -->
+
+        <div class="row">
+            <div class="header">
+                <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+                    style="color:  #269ad3; text-align: center; padding-top: 20px;" class="">
+                    Update Trip Details</h1><br>
+                <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+                    style="color:  #269ad3; text-align: center; padding-top: 20px;" class="">
+
+                </h1><br>
+
+            </div>
+            <form action="/trips/updatetripdata?tid=<%=data[0][0].trip_id%>" method="post"
+                style="max-width: 1000px;" onsubmit="return datavalidation()"
+                class="mx-auto bg-white rounded-md p-3 shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)]">
+
+
+                
+                <div class="col">
+                    <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                        style="font-size: 20px;">Title</label>
+                    <input type="text" id="title" name="title" style=" background-color: white;  "
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 "
+                        class="" placeholder="Enter the title" value="<%=data[0][0].title%>" required />
+                        <p class="  validate_of" id="" style="color:red;"> </p><br>
+
+
+
+                    <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                        style="font-size: 20px;">Location</label>
+                    <input type="text" id="location" autocomplete="off" name="location"
+                        style=" background-color: white;  "
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 bg-[lightgray]"
+                        placeholder="Enter the location" oninput="showresult(this.value)"
+                        value="<%=data[0][0].location%>" required />
+                    <div id="result2" style="width: 1000px; z-index: 1; max-height: 300px;"></div>
+                    <p class="  validate_of" id="" style="color:red;"> </p><br>
+
+
+                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                        style="font-size: 20px;"> Description</label>
+                    <textarea id="description" rows="4" name="description"
+                        style=" background-color: white;  "
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 bg-[lightgray]"
+                        placeholder=""
+                        value="<%= data[0][0].discription %>"> <%= data[0][0].discription %></textarea>
+                        <p class="  validate_of" id="" style="color:red;"> </p><br><br>
+
+                    <div class="flex">
+                        <label for="triptype" style=" font-size: 20px; padding-right: 35px;">Choose Trip Type</label>
+                        <select name="triptype" id="triptype" class="min-w-[218px] min-h-[28px] text-center"
+                            style=" background-color: white; opacity: 0.8; ">
+                            <option value="1" <% if (data[0][0].trip_type_id==1){%> selected <%}%> >summer</option>
+                            <option value="2" <% if (data[0][0].trip_type_id==2){%> selected <%}%> >winter</option>
+                            <option value="3" <% if (data[0][0].trip_type_id==3){%> selected <%}%> >monsoon</option>
+                            <option value="4" <% if (data[0][0].trip_type_id==4){%> selected <%}%>>autoom</option>
+                        </select>
+                    </div>
+                    <br><br>
+
+
+
+
+                    <div class="buttons flex" style="margin-top: 40px;">
+
+                        <input type="submit"
+                            class="text-black bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                            value="Update Trip" style="text-align: center;
+                              margin-left: 20%;
+                              min-width: 242px;
+                              cursor: pointer;">
+
+                        <a href="/create"><input type="button"
+                                class="text-black bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                                value="Cancel" style="text-align: center;
+                                   margin-left: 32%;
+                                   min-width: 242px;
+                                   cursor: pointer;">
+                        </a>
+
+                    </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</section>
+
+<script src="/js/updatetrip.js"></script>

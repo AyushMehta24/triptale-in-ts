@@ -1,0 +1,54 @@
+<div class="h-full w-full fixed hidden top-0 z-0" id="details"></div>
+<div
+  class="w-[290px] h-[530px] hidden border-2 rounded-lg border-black fixed top-16 right-3 z-20 post-user-font flex flex-col bg-white overflow-x-scroll"
+  id="postCard"
+>
+  <div class="relative" data-prevcount="0" id="imageDiv">
+    <button id="leftbtn" class="leftbtn absolute top-1/2 left-1">
+      <div
+        class="h-5 w-5 z-30 rounded-full bg-white flex justify-center items-center"
+      >
+        <img
+          class="h-5 w-5 rotate-180"
+          src="/assets/images/arrow-right.png"
+          alt="left"
+        />
+      </div>
+    </button>
+    <button id="rightbtn" class="rightbtn absolute top-[50%] right-1">
+      <div
+        class="h-5 w-5 z-0 rounded-full bg-white flex justify-center items-center"
+      >
+        <img class="h-5 w-5" src="/assets/images/arrow-right.png" alt="right" />
+      </div>
+    </button>
+  </div>
+  <div class="p-2">
+    <button
+      class="fixed right-5 top-[70px] backdrop-blur-sm bg-white/30 w-6 h-6 rounded-full flex justify-center items-center"
+      id="closebtn"
+    >
+      <img src="/assets/images/close.png" class="w-4 h-4" alt="close" />
+    </button>
+    <div class="flex gap-2">
+      <img id="profile" class="h-8 w-8 rounded-full mt-2" src="" />
+      <div>
+        <h3 id="username" class="text-black font-semibold text-lg"></h3>
+        <P id="location"></P>
+      </div>
+    </div>
+    <div class="p-4 flex flex-col gap-3">
+      <div>
+        <p id="postlikes" class="text-sm font-semibold text-gray-500"></p>
+        <p id="postComments" class="text-sm font-semibold text-gray-500"></p>
+      </div>
+      <div>
+        <p id="hashtags" class="text-sm font-semibold text-gray-500"></p>
+        <p id="tagpeoples" class="text-sm font-semibold text-gray-500"></p>
+      </div>
+    </div>
+    <div>
+      <p id="desc" class="text-justify"></p>
+    </div>
+  </div>
+</div>

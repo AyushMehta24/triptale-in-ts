@@ -1,0 +1,152 @@
+<div class="flex">
+  <section class="mx-auto w-[26rem]">
+    <% for( let index = showPosts.length - 1; index >= 0; index-- ) { %>
+    <div class="p-4 post<%=showPosts[index].id %>">
+      <div
+        class="bg-white max-w-fit mx-auto border-b border-gray-300 pb-10 post-user-font"
+      >
+        <a
+          href="/search/profile?userid=<%=showPosts[index].userId%>"
+          class="cursor-pointer max-w-fit"
+        >
+          <div class="flex items-center px-4 py-3">
+            <img
+              class="h-8 w-8 rounded-full"
+              src="<%=showPosts[index].profile_image%>"
+            />
+            <div class="ml-3">
+              <span
+                class="text-sm font-semibold antialiased block leading-tight"
+                ><%=showPosts[index].username%></span
+              >
+              <span class="text-gray-600 text-xs block"
+                ><%=showPosts[index].location %></span
+              >
+            </div>
+          </div>
+        </a>
+        <div>
+          <% if (showPosts[index].ismultiple) { %>
+          <div class="flex relative w-fit" data-prevcount="0">
+            <button id="leftbtn">
+              <div
+                class="h-6 w-6 bg-white absolute top-[50%] -left-2.5 z-0 rounded-full flex justify-center items-center"
+              >
+                <img
+                  class="h-6 w-6 rotate-180"
+                  src="/assets/images/arrow-right.png"
+                  alt="left"
+                />
+              </div>
+            </button>
+
+            <% if (showPosts[index].isvideo[0]) { %>
+            <video
+              class="object-cover w-96 postsImage cursor-pointer h-96"
+              src="/posts/<%=showPosts[index].image[0] %>"
+              data-id="<%=showPosts[index].id %>"
+              autoplay
+            ></video>
+            <% } else {%>
+            <img
+              class="object-cover w-96 postsImage cursor-pointer h-96"
+              src="/posts/<%=showPosts[index].image[0] %>"
+              data-id="<%=showPosts[index].id %>"
+            />
+            <% } %> <% for( let imageIndex = 1; imageIndex <
+            showPosts[index].image.length; imageIndex++ ) { %> <%
+            if(showPosts[index].isvideo[imageIndex]) { %>
+            <video
+              class="object-cover w-96 postsImage cursor-pointer hidden h-96"
+              src="/posts/<%=showPosts[index].image[imageIndex] %>"
+              data-id="<%=showPosts[index].id %>"
+              autoplay
+            ></video>
+            <% } else { %>
+            <img
+              class="object-cover w-96 postsImage cursor-pointer hidden h-96"
+              src="/posts/<%=showPosts[index].image[imageIndex] %>"
+              data-id="<%=showPosts[index].id %>"
+            />
+            <% } %> <% } %>
+
+            <button id="rightbtn">
+              <div
+                class="h-6 w-6 bg-white absolute top-[50%] -right-2.5 z-0 rounded-full flex justify-center items-center"
+              >
+                <img
+                  class="h-6 w-6"
+                  src="/assets/images/arrow-right.png"
+                  alt="right"
+                />
+              </div>
+            </button>
+          </div>
+          <% } else { %> <% if (showPosts[index].isvideo[0]) { %>
+          <video
+            class="object-cover w-96 postsImage cursor-pointer h-96"
+            src="/posts/<%=showPosts[index].image[0] %>"
+            data-id="<%=showPosts[index].id %>"
+            autoplay
+          ></video>
+          <% } else {%>
+          <img
+            class="object-cover w-96 postsImage cursor-pointer h-96"
+            src="/posts/<%=showPosts[index].image[0] %>"
+            data-id="<%=showPosts[index].id %>"
+          />
+          <% } %> <% } %>
+        </div>
+        <div class="flex gap-3 relative items-center mx-4 mt-4 mb-2">
+          <img class="h-6 w-6 cursor-pointer like" src="<%=showPosts[index].flag
+          !== null ? (showPosts[index].flag == 1 ? "/assets/images/like.png" :
+          "/assets/images/fill-like.png") : "/assets/images/like.png" %>"
+          alt="like" id="<%=showPosts[index].id %>" />
+          <img
+            class="h-6 w-6 comment cursor-pointer"
+            src="/assets/images/comment.png"
+            alt="comment"
+          />
+          <img class="h-6 w-6 save absolute right-[0px] cursor-pointer" src="<%=
+          showPosts[index].save_posts == null ? "/assets/images/save-icon.png" :
+          "/assets/images/save-fill-icon.png"%>" alt="save" />
+        </div>
+        <div class="font-semibold text-sm ml-4">
+          <p class="likeByDetails cursor-pointer w-fit">
+            <%=showPosts[index].like_count%> Likes
+          </p>
+        </div>
+        <div class="font-semibold text-sm ml-4">
+          <p class="comment cursor-pointer w-fit">
+            <%=showPosts[index].comment_count%> comments
+          </p>
+          <div class="flex">
+            <p class="font-normal truncate w-36 text-[15px]">
+              <span class="font-bold"><%=showPosts[index].username%></span>
+              <%=showPosts[index].caption%>
+            </p>
+            <span
+              class="more hidden ml-1 font-bold cursor-pointer text-[13px] text-gray-500"
+              >more
+            </span>
+          </div>
+        </div>
+        <div class="font-semibold text-xs mt-2 ml-4 text-gray-500">
+          <p><%=showPosts[index].create_at%></p>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </section>
+  <%- include('homeRightSideBar')%>
+</div>
+<%- include('postDetails')%>
+
+<script src="/js/homeScript/homeScript.js"></script>
+<script src="/js/homeScript/fetchLikeComment.js"></script>
+<script src="/js/homeScript/commentSocket.js"></script>
+<script src="/js/homeScript/postSlider.js"></script>
+<script src="/js/homeScript/postDetails.js"></script>
+<script src="/js/homeScript/savePost.js"></script>
+<script src="/js/homeScript/fetchreplyComment.js"></script>
+<script src="/js/homeScript/scrroling.js"></script>

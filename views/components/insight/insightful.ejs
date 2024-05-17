@@ -1,0 +1,209 @@
+<% if(type=="trip" ){ %>
+
+    <div id="content">
+
+        <a href="/displayTrip/<%=tripInsight.trip_id%>"
+            class="p-6 m-6 flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row  hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+            <img class="pl-4 md:rounded-s-lg" src="/trips/tripcover/<%=tripInsight.cover_image%> " alt="" width="300px"
+                height="200px">
+            <div class="flex flex-col justify-between p-4 leading-normal">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    <%=tripInsight.title %>
+                </h5>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                    <%=tripInsight.discription%>
+                </p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                    <%=new Date(tripInsight.start_date).toLocaleString("en-IN").split(',')[0]%> <b>-></b>
+                        <%=new Date(tripInsight.end_date).toLocaleString("en-IN").split(',')[0]%>
+                </p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                    <%=tripInsight.location %>
+                </p>
+
+            </div>
+        </a>
+
+
+
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+
+            <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                <div class="flex justify-between mb-4">
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <div class="text-2xl font-semibold" id="likesCount">
+                                <%=totaldays.totaldays%>
+                            </div>
+
+                        </div>
+                        <div class="text-sm font-medium text-gray-400">Total Days</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                <div class="flex justify-between mb-4">
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <div class="text-2xl font-semibold" id="likesCount">
+                                <%=totalevents.totalevents%>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-gray-400">Total Event</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                <div class="flex justify-between mb-4">
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <div class="text-2xl font-semibold" id="totalmembers">
+                                <%=totalmembers.totalmembers%>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-gray-400">Total Members</div>
+                        <button class="text-[#f84525] font-medium text-sm hover:text-red-800"
+                            onclick="openForm('tripInsight/trip_members','totalmembers',<%=id%>)">View</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                <div class="flex justify-between mb-4">
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <div class="text-2xl font-semibold" id="likesCount">
+                                <%=totalimage.totalimage%>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-gray-400">Total Images</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% }else{ %>
+        <div class="p-6" id="content">
+            <a href="/search/posts?post_id=<%=id%>"
+                class="m-6 flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row  hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+                <% if(insightPost.isvideo){ %>
+                    <video width="300px"
+                    height="200px"  controls>
+                        <source src="/posts/<%=insightPost.image%>" type="video/mp4">
+                    </video>
+                    <% }else{ %>
+                <img class="p-14 md:rounded-s-lg" src="/posts/<%=insightPost.image%>" alt="" width="300px"
+                    height="50px">
+                    <% } %>
+                <div class="flex flex-col justify-between p-4 leading-normal">
+                    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                        <%=new Date(insightPost.create_at).toISOString().split('T')[0]%>
+                    </p>
+                    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                        <%=insightPost.location%>
+                    </p>
+
+                </div>
+            </a>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+
+                <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <div class="text-2xl font-semibold" id="likesCount"><%=insightDashbord.like_count%></div>
+                               
+                            </div>
+                            <div class="text-sm font-medium text-gray-400">Likes</div>
+                        </div>
+                        <div class="dropdown">
+                            <button type="button" class="dropdown-toggle text-gray-400 hover:text-gray-600"><i
+                                    class="ri-more-fill"></i></button>
+                            <ul
+                                class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-1.5 rounded-md bg-white border border-gray-100 w-full max-w-[140px]">
+                                <li>
+                                    <a href="#"
+                                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Profile</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Settings</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="text-[#f84525] font-medium text-sm hover:text-red-800"
+                        onclick="openForm('likeUserName','Likes',<%=id%>)">View</button>
+
+                </div>
+                <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                    <div class="flex justify-between mb-6">
+                        <div>
+                            <div class="text-2xl font-semibold mb-1" id="commentsCount"><%=insightDashbord.comment_count%></div>
+                            <div class="text-sm font-medium text-gray-400">Comments</div>
+                        </div>
+                        <div class="dropdown">
+                            <button type="button" class="dropdown-toggle text-gray-400 hover:text-gray-600"><i
+                                    class="ri-more-fill"></i></button>
+                            <ul
+                                class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-1.5 rounded-md bg-white border border-gray-100 w-full max-w-[140px]">
+                                <li>
+                                    <a href="#"
+                                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Profile</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Settings</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class=" text-[#f84525] font-medium text-sm hover:text-red-800"
+                        onclick="openForm('commentUserName','Comments',<%=id%>)">View</button>
+                </div>
+            </div>
+        </div>
+        <% } %>
+            <div class="form-popup" id="myForm" style="width:500px;height: 400px;overflow: scroll;">
+                <button onclick="closeForm()" id="closeButton">X</button>
+                <span id="setContent" style="padding-left: 10px;"></span>
+                <div class="">
+
+                    <div class="overflow-scroll">
+                        <table class="w-full">
+                            <!-- <thead>
+                    <tr>
+                        <th class="text-[12px] uppercase  font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                            Username</th>
+                    </tr>
+                </thead> -->
+                            <tbody id="setUserName">
+
+
+                                <!-- <tr>
+                        
+                        <td class="py-2 px-4 border-b  flex">
+                            <img src="/ram.jpg" alt="" srcset="" width="30px" height="20px">
+                            <span class="inline-block p-1  ">Pending</span>
+                        </td>
+                    </tr> -->
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <script src="/js/insight.js">dashboard()</script>
+            <% if(type !="trip" ){ %>
+
+                <script>dashboard(<%=id %>)</script>
+                <% } %>

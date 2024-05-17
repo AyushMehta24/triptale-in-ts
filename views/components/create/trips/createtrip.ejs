@@ -1,0 +1,115 @@
+<section class="  bg-cover "
+    style="background-image:linear-gradient(rgba(250, 249, 249, 0.8), rgba(250, 248, 248, 0.8)), url(/assets/loginlayout/1976998.jpg)">
+
+
+    <div class="container mx-auto">
+        <!-- Create Trip and post -->
+
+        <div class="row">
+            <div class="header">
+                <h1 class="text-5xl font-extrabold leading-none tracking-tight text-gray-900  dark:text-white head-font text-center pt-3"
+                >
+                    Create Trip</h1><br>
+            </div>
+            <form action="/trips/uploadtrip"  method="post" enctype='multipart/form-data'
+                onsubmit="return datavalidation()" style="max-width: 1000px;"
+                class="mx-auto bg-white rounded-md overflow-scroll max-h-[40rem] p-5 shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)]">
+                <div class="col">
+                    <label for="coverphoto" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black sub-font">Upload Cover Photo :</label>
+
+
+                    <div class="flex items-center justify-center w-full">
+                        <label for="dropzone-file"
+                            class="flex flex-col items-center justify-center w-full h-20 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 bg-[lightgray] border-[2px] border-[dotted] border-[black] sub-font"
+                            style=" background-color: white; opacity: 0.8; ">
+                            <div class="flex flex-col items-center justify-center ">
+                                <svg class="w-8  text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                                </svg>
+                                <p class=" text-sm text-gray-500 dark:text-gray-400"><span
+                                        class="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400"> PNG, JPG or JPEG (MAX.
+                                    800x400px)</p>
+                            </div>
+                            <input id="dropzone-file" type="file" class="hidden images"
+                                style=" background-color: white;  " name="tripimage">
+                        </label>
+                    </div>
+                    <div class="displayimage"><output class="mt-6"></output></div>
+                    <p id="fileerror" style="color: red;"></p><br>
+                </div>
+
+                <div class="col">
+                    <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black sub-font">Title :</label>
+                    <input type="text" id="title" name="title"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 sub-font" placeholder="Enter the title" /><br>
+                         <p class="  validate_of" id="" style="color:red;"> </p>
+
+                    <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black sub-font">Location :</label>
+                    <input type="text" id="location" autocomplete="off" name="location"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 bg-[lightgray] sub-font"
+                        placeholder="Enter the location" oninput="showresult(this.value)"  />
+                    <div id="result2" style="width: 1000px; z-index: 1; max-height: 300px; position: relative;"></div>
+                     <p class="  validate_of" id="" style="color:red;"> </p>
+                    <div class="my-4">
+                        <label for="Members" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black sub-font">Add Members :</label>
+                        <ul id="peopleTagsList" class="[list-style:none] p-0 m-0" style="color: black; opacity: 0.8;">
+                        </ul>
+                        <input id="peopleTag"
+                            class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sub-font"
+                            placeholder="Search user end select" style=" background-color: white;  ">
+                        <ul class="list"></ul>
+                    </div>
+                    <p id="addperson"></p>
+                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black sub-font"> Description :</label>
+                    <textarea id="description" rows="4" name="description"
+                        style=" background-color: white;  "
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 bg-[lightgray] sub-font resize-none"
+                        placeholder="Write your description here..."></textarea><br>
+                        <p class="  validate_of" id="" style="color:red;"> </p>
+                         <p id="descerror" style="color: red;"></p>
+                    <label for="startdate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black sub-font">Start Date :</label>
+                    <input type="date" id="startdate" name="startdate" style=" background-color: white;  "
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 bg-[lightgray] sub-font"
+                        placeholder="Enter the Start Date"  /><br>
+                        <p class="  validate_of" id="" style="color:red;"> </p>
+                    <label for="enddate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black sub-font" onkeydown="">End Date :</label>
+                    <input type="date" id="enddate" name="enddate"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 bg-[lightgray] sub-font"
+                        placeholder="Enter the End Date"  />
+                         <p class="  validate_of" id="" style="color:red;"> </p>
+                    <p id="dateerror" style="color: red;"></p><br>
+                    <div class="flex">
+                        <label for="triptype" class="sub-font mr-2">Choose Trip Type :</label>
+                        <select name="triptype" id="triptype" class="min-w-[218px] min-h-[28px] text-center sub-font">
+                            <option value="1">summer</option>
+                            <option value="2">winter</option>
+                            <option value="3">monsoon</option>
+                            <option value="4">autoom</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="buttons flex" >
+                        <input type="submit"
+                            class="text-black bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 sub-font"
+                            value="Post Trip" style="text-align: center;
+                        margin-left: 20%;
+                        min-width: 242px;
+                        cursor: pointer;">  
+                        <a href="/create"><input type="button"
+                                class="text-black bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 sub-font"
+                                value="Cancel" style="text-align: center;
+                        margin-left: 32%;
+                        min-width: 242px;
+                        cursor: pointer;">
+                        </a>
+                    </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</section>
+<script src="/js/tripmembers.js"></script>

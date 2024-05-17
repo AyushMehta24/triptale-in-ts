@@ -1,0 +1,35 @@
+<section
+  class="mx-auto   w-1/2 bg-[#fff] mt-6 bg-white rounded-md p-3 shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)]">
+  <div class=" h-[30rem] relative ">
+    <div class="p-[5px] bg-[#f1f1f1] rounded-md  flex items-center justify-between">
+      <h1 class="uppercase text-[20px] text-[#444] ml-[10px]">Let's Chat Buddy's</h1>
+      <a href="javascript:history.back()"
+        class="text-white ml-1   bg-[#8F8BE8] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2 text-center ">
+        Back</a>
+    </div>
+
+    <div class="h-[80%] p-[16px] flex flex-col overflow-y-auto pt-[40px] message__area mb-1">
+      
+    </div>
+    <div class="w-12 h-12 hidden absolute m-auto left-0 right-0 top-0 bottom-0   chat-loader rounded-full animate-spin border-8 border-solid border-purple-500 border-t-transparent"></div>
+    <div class="flex items-center">
+      <div class="relative w-[90%] ">
+        <textarea id="textarea" autofocus placeholder="Write a message..." rows="1" 
+        class="p-[10px]  rounded-md text-[16px] placeholder:text-white text-white  resize-none w-full  bg-[#8F8BE8]"></textarea>
+        <button type="button"  class="absolute top-0 end-0 p-[13px] rounded-e-md">
+          <img src="/assets/loginlayout/face-smile-regular.svg" id="emojiPickerBtn" class="w-5 opacity-60" alt="">
+        </button>
+      </div>
+
+      <button class="p-[14px] rounded-md bg-[#8F8BE8] ml-[2px]" id="sendMessage">
+        <img src="/assets/loginlayout/paper-plane-solid.svg" class="w-5" alt="">
+      </button>
+      <div class="fixed top-0 left-0 z-0 hidden w-full h-full" id="forHideEmojiPicker"></div>
+      <emoji-picker class="top-10 z-10 absolute hidden p-2 bg-black rounded-3xl -right-1/2" id="emojiPicker"></emoji-picker>
+    </div>
+  </div>
+
+  
+</section>
+
+<script type="module" src="/js/tripChat.js"></script>

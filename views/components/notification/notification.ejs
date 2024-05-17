@@ -1,0 +1,318 @@
+<div
+    class="fixed top-16 w-full z-1 mt-0.5 p-3 bg-white border border-gray-200 rounded-lg shadow-2xl content-center top-0">
+    <p
+        class="text-1xl text-center justify-center md:text-1xl lg:text-1xl font-bold tracking-wider text-gray-3 head-font">
+        Notification
+    </p>
+</div>
+<% if(resultTrip.length==0 && resultPost.length==0){ %>
+    <div class="m-12 p-6 bg-white border border-gray-200 rounded-lg shadow-2xl">
+        <p class="text-1xl text-center md:text-1xl lg:text-1xl font-bold tracking-wider text-gray-3">No Notification
+            found
+        </p>
+    </div>
+    <% } %>
+        <div class="container mx-auto sub-font mt-[3rem] z-0" style=" list-style: none;">
+
+            <div id="socket-notification">
+
+            </div>
+            <div id="new-notification">
+                <% if(resultTrip.length!=0){ %>
+                    <% for(let temp in resultTrip){ %>
+                        <%const difference=new Date().getTime() - resultTrip[temp].create_at; %>
+                            <%const days=Math.floor(difference / (1000 * 60 * 60 * 24)); const
+                                hours=Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); const
+                                minutes=Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); const
+                                seconds=Math.floor((difference % (1000 * 60)) / 1000); %>
+                                <li data-id="<%=new Date(resultTrip[temp].create_at).valueOf()%>">
+                                    <div class="" style="margin:0 auto;padding:10 120px;">
+
+                                        <div class="flex items-center flex justify-between">
+                                            <div class="flex">
+                                                <a href="/search/profile?userid=<%=resultTrip[temp].create_user_id %>">
+
+                                                    <div class=" inline-block shrink-0 ">
+
+                                                        <img src="<%=resultTrip[temp].profile_image%>"
+                                                            class="w-12 h-12 rounded-full flex justify-end" alt=""
+                                                            srcset="">
+
+                                                    </div>
+                                                    <div class="ms-3 text-sm font-normal">
+                                                        <div
+                                                            class="text-sm font-semibold text-gray-900 dark:text-white">
+
+                                                            <%=resultTrip[temp].username%>
+
+                                                        </div>
+                                                        <div class="text-sm font-normal">
+                                                            <%=resultTrip[temp].name%>
+
+                                                        </div>
+                                                        <span
+                                                            class="text-xs font-medium text-blue-600 dark:text-blue-500">
+                                                            <%=days==0?hours==0?minutes==0?`a ${seconds} seconds ago`:`a
+                                                                ${minutes} minutes ago`:`a ${hours} hours ago`:`a
+                                                                ${days} days ago` %>
+
+                                                        </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="ms-3 text-sm font-normal">
+                                            <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                                                you are add to this trip
+                                            </div>
+                                        </div>
+
+                                        <div class="flex justify-end inline" style="margin-top: 10px;">
+                                            <a href="/displayTrip">
+                                                <img class="w-12 h-12 rounded"
+                                                    src="/trips/tripcover/<%=resultTrip[temp].cover_image%>"
+                                                    alt="Jese Leos image" />
+
+                                            </a>
+                                        </div>
+
+                                    </div>
+
+            </div>
+            </li>
+            <% } %>
+                <% } %>
+                    <% if(resultPost.length!=0){ %>
+                        <% for(let temp in resultPost){ %>
+                            <%const difference=new Date().getTime() - resultPost[temp].create_at; %>
+                                <%const days=Math.floor(difference / (1000 * 60 * 60 * 24)); const
+                                    hours=Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); const
+                                    minutes=Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); const
+                                    seconds=Math.floor((difference % (1000 * 60)) / 1000); %>
+                                    <li data-id="<%=new Date(resultPost[temp].create_at).valueOf()%>">
+
+                                        <div class="" style="margin:0 auto;padding:10 120px;">
+
+                                            <div class="flex items-center flex justify-between">
+                                                <a href="/search/profile?userid= <%=resultPost[temp].like_by%>">
+                                                    <div class="flex">
+
+                                                        <div class=" inline-block shrink-0">
+
+                                                            <img class="w-12 h-12 rounded-full"
+                                                                src="<%=resultPost[temp].profile_image%>"
+                                                                alt="Jese Leos image" />
+
+                                                        </div>
+
+                                                        <div class="ms-3 text-sm font-normal">
+
+                                                            <%=resultPost[temp].username%>
+                                                                <div
+                                                                    class="text-sm font-semibold text-gray-900 dark:text-white">
+
+
+                                                                </div>
+                                                                <div class="text-sm font-normal">
+                                                                    <%=resultPost[temp].first_name%>
+                                                                        <%=resultPost[temp].last_name%>
+                                                                </div>
+                                                                <span
+                                                                    class="text-xs font-medium text-blue-600 dark:text-blue-500">
+                                                                    <%=days==0?hours==0?minutes==0?`a ${seconds} seconds
+                                                                        ago`:`a ${minutes} minutes ago`:`a ${hours}
+                                                                        hours ago`:`a ${days} days ago` %>
+
+                                                                </span>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <div class="ms-3 text-sm font-normal">
+                                                    <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                                                        <%=resultPost[temp].content%>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex justify-end inline" style="margin-top: 10px;">
+                                                    <a
+                                                        href="/search/posts?user_id=<%=resultPost[temp].user_id%>&post_id=<%=resultPost[temp].post_id[0]%>">
+                                                    <% if(resultPost[temp].isvideo==1){ %>
+                                                        <video class="w-12 h-12" >
+                                                            <source src="/posts/<%=resultPost[temp].image%>"
+                                                                type="video/mp4">
+
+                                                        </video>
+                                                        <%} else{ %>
+                                                                <img src="/posts/<%=resultPost[temp].image%>"
+                                                                    class="w-12 h-12 rounded flex justify-end" alt=""
+                                                                    srcset="">
+                                                                <% } %>
+                                                            </a>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="flex items-center"></div> -->
+
+                                        </div>
+                                    </li>
+                                    <% } %>
+                                        <% } %>
+
+        </div>
+
+
+        <script>
+            let messages = document.getElementById("socket-notification");
+            let userId = "<%=userId %>"
+            let socket = io();
+            socket.on(`notification-like-${userId}`, async function (data, content, flag) {
+                let tempHtml = ``
+                if (flag == undefined) {
+
+                    if (data.isvideo) {
+                        tempHtml = `<video class="w-12 h-12"  controls>
+                                                            <source src="/posts/${data.image}" type="video/mp4">
+                                                            
+                                                        </video>`
+                    } else {
+                        tempHtml = ` <img src="/posts/${data.image}" class="w-12 h-12 rounded" alt="" srcset="">`
+
+                    }
+
+
+                    let temp = `
+            <div class="" style="margin:0 auto;padding:10 120px;">
+        <div class="flex items-center flex justify-between mb-0 bg-red-500" style="background-color:rgb(230, 116, 116);">
+       
+        <div class="flex">
+            <div class="flex items-center">
+                <div class=" inline-block shrink-0">
+                    <img class="w-12 h-12 rounded-full" src="${data.profile_image}" alt="Jese Leos image" />
+
+                </div>
+                <div class="ms-3 text-sm font-normal">
+                    <div class="text-sm font-semibold text-gray-900 dark:text-white">${data.username}</div>
+                    <div class="text-sm font-normal">
+                    ${data.first_name} ${data.last_name}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ms-3 text-sm font-normal">
+                    <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                        ${content}
+                    </div>
+                </div>
+                <div class="flex justify-end inline" style="margin: 10px 7px;">
+                                                                
+           
+           ${tempHtml}
+                   
+    
+                </div>
+            </div>
+    </div>
+    </div>
+`
+
+
+                    let item = document.createElement("div");
+                    item.innerHTML = temp;
+                    messages.appendChild(item);
+                    window.scrollTo(0, document.body.scrollHeight);
+                } else {
+                    let temp = ` <div class="" style="margin:0 auto;padding:10 120px;">
+        <div class="flex items-center flex justify-between mb-0 bg-red-500" style="background-color:rgb(230, 116, 116);">
+       
+            <a
+            href="/search/profile?userid=${data.create_user_id}">
+    <div class="flex">
+
+        <div class=" inline-block shrink-0">
+
+            <img src="${data.profile_image}"
+                class="w-12 h-12 rounded-full flex justify-end" alt=""
+                srcset="">
+
+        </div>
+        <div class="ms-3 text-sm font-normal">
+            <div class="text-sm font-semibold text-gray-900 dark:text-white">
+               
+                    ${data.username}
+               
+            </div>
+            <div class="text-sm font-normal">
+                ${data.name}
+
+            </div>
+           
+        </div>
+        </div>
+        </a>
+    <div class="ms-3 text-sm font-normal">
+        <div class="text-sm font-semibold text-gray-900 dark:text-white">
+            you are add to this trip
+        </div>
+    </div>
+
+    <div class="flex justify-end inline" style="margin-top: 10px;">
+        <a href="/displayTrip">
+            <img class="w-12 h-12 rounded"
+                src="/trips/tripcover/${data.cover_image}"
+                alt="Jese Leos image" />
+
+        </a>
+    </div>
+
+</div>
+
+</div>`
+                    socket.emit('end')
+                    let item = document.createElement("div");
+                    item.innerHTML = temp;
+                    messages.appendChild(item);
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            });
+
+            document.getElementById('notification').style.display = "none"
+            localStorage.setItem('display', "none")
+            localStorage.clear()
+
+            // localStorage.clear()
+        </script>
+
+        <script>
+            function sort() {
+
+                let new_notification, i, run, li, stop;
+
+                new_notification = document.getElementById("new-notification");
+
+                run = true;
+
+                while (run) {
+                    run = false;
+                    li = new_notification.getElementsByTagName("LI");
+
+                    for (i = 0; i < (li.length - 1); i++) {
+                        stop = false;
+                        if (li[i].getAttribute("data-id") <
+                            li[i + 1].getAttribute("data-id")) {
+                            stop = true;
+                            break;
+                        }
+                    }
+
+
+                    if (stop) {
+                        li[i].parentNode.insertBefore(
+                            li[i + 1], li[i]);
+
+                        run = true;
+                    }
+                }
+            }
+            sort()
+        </script>
+        <script>
+            socket.emit('end');
+        </script>

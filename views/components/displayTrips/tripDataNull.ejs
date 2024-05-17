@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <%if(errorType == "NoTrips"){%>
+    <div
+      class="min-h-screen flex flex-grow items-center justify-center bg-gray-50"
+    >
+      <div class="rounded-lg bg-white p-8 text-center shadow-xl">
+        <h1 class="mb-4 text-4xl font-bold"><%=message%></h1>
+        <a
+          href="/trips/createtrip"
+          class="mt-4 inline-block rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
+        >
+          Add Trips
+        </a>
+      </div>
+    </div>
+    <%}%>
+
+    <!--  -->
+
+    <%if(errorType == "NoTripsData"){%>
+    <div
+      class="min-h-screen flex flex-grow items-center justify-center bg-gray-50"
+    >
+      <div class="rounded-lg bg-white p-8 text-center shadow-xl">
+        <h1 class="mb-4 text-4xl font-bold"><%=message%></h1>
+        <a
+          href="/trips/insertdays/<%=tripId%>"
+          class="mt-4 inline-block rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
+        >
+          Add Details Of Trip
+        </a>
+      </div>
+    </div>
+    <%}%>
+  </body>
+</html>

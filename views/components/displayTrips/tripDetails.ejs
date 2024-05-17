@@ -1,0 +1,392 @@
+<div class="p-3">
+  <custom-timeline5>
+    <section class="">
+      <div class="flex flex-col">
+        <a
+          class="text-white align-center text-center w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 block"
+          href="/displayTrip"
+        >
+          Back
+        </a>
+
+        <div class="container max-w-5xl px-4 py-12 mx-auto">
+          <div class="flex gap-4 mx-4 sm:grid-cols-12 justify-between">
+            <div class="col-span-12 sm:col-span-3">
+              <div
+                class="text-center sm:text-left mb-14 before:block before:w-24 before:h-3 before:mb-5 before:rounded-md before:mx-auto sm:before:mx-0 before:bg-violet-400"
+              >
+                <h3
+                  class="text-3xl font-semibold capitalize"
+                  style="
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                  "
+                >
+                  <%=data[0].mainTitle%>
+                </h3>
+                <br />
+                <span
+                  class="text-sm font-bold tracking-wider capitalize text-gray-400 block w-[200px]"
+                >
+                  <%=data[0].mainDiscription%>
+                </span>
+              </div>
+              <div class="flex flex-col">
+                <a href="/displayTrip/chat/<%=data[0].trip_id%>">
+                  <button
+                    class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
+                  >
+                    Message
+                  </button>
+                </a>
+                <a href="/trips/insertdays/<%=data[0].trip_id%>">
+                  <button
+                    class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
+                  >
+                    Add Days
+                  </button>
+                </a>
+                <a href="/trips/editmembers/<%=data[0].trip_id%>">
+                  <button
+                    class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
+                  >
+                    Edit Members
+                  </button>
+                </a>
+                <a href="/trips/eventcreate/<%=data[0].trip_id%>">
+                  <button
+                    class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
+                  >
+                    Create Event
+                  </button>
+                </a>
+              </div>
+            </div>
+            <%if(errorType !== ""){%>
+            <div class="relative col-span-12 pl-4 space-y-6 sm:col-span-9">
+              <p class="text-xl font-semibold tracking-wide capitalize">Days</p>
+              <p>No Days To Show</p>
+            </div>
+            <%}%> <%if(errorType == ""){%>
+            <div class="relative col-span-12 pl-4 space-y-6 sm:col-span-9">
+              <p class="text-xl font-semibold tracking-wide capitalize">Days</p>
+              <div
+                class="col-span-12 space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:bg-gray-700"
+              >
+                <%for(let i=0 ; i < data.length ; i++) {%>
+
+                <div
+                  id="<%=i%>"
+                  class="flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] before:bg-violet-400"
+                >
+                  <h3 class="text-xl font-semibold tracking-wide capitalize">
+                    <%=data[i].title%>
+                  </h3>
+                  <img
+                    id="dot[<%=i%>]"
+                    class="cursor-pointer"
+                    style="position: absolute; left: 90%; height: 30px"
+                    src="/assets/loginlayout/three_dots.png"
+                    alt=""
+                    onclick="updateBox('smallCard[<%=i%>]')"
+                   
+                  />
+
+                  <div
+                    id="smallCard[<%=i%>]"
+                    class="hidden w-[125px] absolute text-center top-[40px] right-[-20px] z-1 shadow-xl border bg-white"
+                  >
+                    <a
+                      href="/trips/updateday?tid=<%=data[i].trip_id%>&did=<%=data[i].id%>"
+                      class="cursor-pointer"
+                      >Update Day</a
+                    >
+                    <p
+                      id="deleteTrip[<%=i%>]"
+                      onclick="deleteDay('<%=i%>' ,'<%=data[i].id%>' )"
+                      class="cursor-pointer"
+                    >
+                      Delete Day
+                    </p>
+                  </div>
+                  <time class="text-xs tracking-wide uppercase text-gray-400">
+                    <%=data[i].dates.getDate() %>-<%= data[i].dates.getMonth()+1
+                    %>-<%= data[i].dates.getFullYear() %>
+                  </time>
+                  <p
+                    class="text-xs tracking-wide capitalize dark:text-gray-600"
+                  >
+                    <%=data[i].location%>
+                  </p>
+                  <p class="mt-3 w-[450px]"><%=data[i].discription%></p>
+                  <a
+                    class="w-[300px]"
+                    href="/displayTrip/images/<%=data[i].trip_id%>/<%=data[i].id%>"
+                  >
+                    <%if(data[i].image.includes("mp4") ||
+                    data[i].image.includes("webm")){%>
+                    <video
+                      class="h-[200px] w-[300px] mt-[15px] rounded-lg object-cover"
+                    >
+                      <source
+                        src="/trips/tripImages/<%=data[i].image%>"
+                        type="video/mp4"
+                      />
+                    </video>
+                    <%}else{%> <%if(data[i].image === "AddImage.png"){ %>
+                    <img
+                      class="h-[200px] w-[300px] mt-[15px] rounded-lg object-cover"
+                      src="/assets/images/AddImage.png"
+                      alt=""
+                    />
+                    <%}else{ %>
+                    <img
+                      class="h-[200px] w-[300px] mt-[15px] rounded-lg object-cover"
+                      src="/trips/tripImages/<%=data[i].image%>"
+                      alt=""
+                    />
+                    <%}%> <%}%>
+                  </a>
+                </div>
+                <%}%>
+              </div>
+            </div>
+            <%}%>
+            <!-- component -->
+            <%if(eventDetails.length == 0){%>
+            <div class="flex flex-col gap-4">
+              <p class="text-xl font-semibold tracking-wide capitalize">
+                Trip Events
+              </p>
+              <p>No Events To Show</p>
+            </div>
+            <%}%>
+            <div class="flex flex-col gap-4">
+              <%if(eventDetails.length > 0){%>
+              <p class="text-xl font-semibold tracking-wide capitalize">
+                Trip Events
+              </p>
+              <%for (let i = 0 ; i < eventDetails.length ; i++ ){%>
+              <div
+                id="parent[<%=i%>]"
+                class="relative flex flex-col md:space-x-5 space-y-3 md:space-y-0 rounded-xl shadow-lg p-3 max-w-xs md:max-w-3xl mx-auto border border-white bg-white w-[300px]"
+              >
+                <img
+                  id="dot[<%=i%>]"
+                  class="cursor-pointer"
+                  style="position: absolute; left: 85%; height: 30px"
+                  src="/assets/loginlayout/three_dots.png"
+                  alt=""
+                  onclick="updateEvent('updatecard[<%=i%>]')"
+                />
+                <div
+                  id="updatecard[<%=i%>]"
+                  class="hidden w-[125px] absolute text-center top-[40px] right-[-20px] z-1 shadow-xl border bg-white"
+                >
+                  <a
+                    href="/trips/eventupdate?tid=<%=eventDetails[i].trip_id%>&eid=<%=eventDetails[i].id%>"
+                    class="cursor-pointer"
+                    >Update Event</a
+                  >
+                  <p
+                    id="deleteTrip[<%=i%>]"
+                    class="cursor-pointer"
+                    onclick="deleteEvent('<%=i%>' , '<%=eventDetails[i].trip_id%>' ,'<%=eventDetails[i].id%>' )"
+                  >
+                    Delete Event
+                  </p>
+                </div>
+
+                <div
+                  id="sparanet[<%=i%>]"
+                  onclick="showEvent('<%=i%>')"
+                  class="flex align-center justify-between"
+                >
+                  <div
+                    class="mt-[-10px] p-[10px] w-full bg-white grid place-items-center"
+                  >
+                    <img
+                      id="img[<%=i%>]"
+                      alt="Event Image"
+                      class="rounded-xl h-[60px]"
+                      src="/trips/tripsevents/<%=eventDetails[i].image%>"
+                    />
+                  </div>
+                  <div class="w-full md:w-2/3 bg-white flex flex-col space-y-2">
+                    <h3 class="font-black text-gray-800 text-base capitalize">
+                      <%=eventDetails[i].title%>
+                    </h3>
+                  </div>
+                </div>
+                <div
+                  class="show[<%=i%>] w-full bg-white flex flex-col space-y-2 pt-3 hidden"
+                >
+                  <span class="text-xs tracking-wide text-gray-400">
+                    From :
+                    <span class="startEvent[<%=i%>]">
+                      <%=eventDetails[i].start_time.getDate()%>-<%=eventDetails[i].start_time.getMonth()%>-<%=eventDetails[i].start_time.getFullYear()%>
+                      <%=eventDetails[i].start_time.getHours()%>:<%=eventDetails[i].start_time.getMinutes()%>
+                    </span>
+                  </span>
+                  <span class="text-xs tracking-wide text-gray-400">
+                    To :
+                    <span class="endEvent[<%=i%>]">
+                      <%=eventDetails[i].end_time.getDate()%>-<%=eventDetails[i].end_time.getMonth()%>-<%=eventDetails[i].end_time.getFullYear()%>
+                      <%=eventDetails[i].end_time.getHours()%>:<%=eventDetails[i].end_time.getMinutes()%>
+                    </span>
+                  </span>
+                </div>
+                <div
+                  class="show[<%=i%>] w-full md:w-2/3 bg-white flex flex-col space-y-2 pt-2 hidden"
+                >
+                  <span class="font-black text-gray-800 text-sm">
+                    <%=eventDetails[i].discription%>
+                  </span>
+                </div>
+              </div>
+              <%}%>
+            </div>
+            <%}%>
+          </div>
+        </div>
+      </div>
+      <script>
+        const eventDetails = JSON.parse(`<%-JSON.stringify(eventDetails)%>`);
+        eventDetails.forEach((date) => {
+          const offset = new Date().getTimezoneOffset();
+          date.start_time = new Date(date.start_time).getTime();
+          date.start_time -= offset * 60 * 1000;
+          date.start_time = new Date(date.start_time);
+
+          date.end_time = new Date(date.end_time).getTime();
+          date.end_time -= offset * 60 * 1000;
+          date.end_time = new Date(date.end_time);
+        });
+        for (let i = 0; i < eventDetails.length; i++) {
+          const stime = `${eventDetails[i].start_time.getDate()}-${eventDetails[
+            i
+          ].start_time.getMonth()}-${eventDetails[
+            i
+          ].start_time.getFullYear()} ${eventDetails[
+            i
+          ].start_time.getHours()}:${eventDetails[i].start_time.getMinutes()}`;
+          document.getElementsByClassName(`startEvent[${i}]`)[0].innerHTML =
+            stime;
+          const etime = `${eventDetails[i].end_time.getDate()}-${eventDetails[
+            i
+          ].end_time.getMonth()}-${eventDetails[
+            i
+          ].end_time.getFullYear()} ${eventDetails[
+            i
+          ].end_time.getHours()}:${eventDetails[i].end_time.getMinutes()}`;
+          document.getElementsByClassName(`endEvent[${i}]`)[0].innerHTML =
+            etime;
+        }
+
+        function deleteEvent(id, tid, eid) {
+          Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              document.getElementById(`parent[${id}]`).style.display = "none";
+              const res = await fetch(
+                `/trips/eventdelete?tid=${tid}&eid=${eid}`,
+                {
+                  method: "post",
+                  headers: { "Content-Type": "application/json" },
+                }
+              );
+              Swal.fire({
+                title: "Deleted!",
+                text: "Your file has been deleted.",
+                icon: "success",
+              });
+            }
+          });
+        }
+
+        function updateEvent(cardId) {
+          const item = document.getElementById(cardId);
+          const classes = [...item.classList];
+          if (classes.includes("hidden")) {
+            document.getElementById(cardId).classList.remove("hidden");
+          } else {
+            document.getElementById(cardId).classList.add("hidden");
+          }
+        }
+
+        function updateBox(cardId) {
+          document.getElementById(cardId).classList.toggle("hidden");
+        }
+
+        function showEvent(i) {
+          document.getElementById(`sparanet[${i}]`).classList.remove("flex");
+          document.getElementById(`img[${i}]`).classList.remove("h-[60px]");
+          document.getElementById(`img[${i}]`).classList.add("w-full");
+          document.getElementById(`img[${i}]`).classList.add("h-[150px]");
+          // document.getElementById(`img[${i}]`).style.transform = 'scale(1)';
+          // document.getElementById(`img[${i}]`).style.transition = "transform 0.25s ease";
+          const item = document.getElementsByClassName(`show[${i}]`);
+          const classes = [...item[0].classList];
+          if (classes.includes("hidden")) {
+            for (let j = 0; j < item.length; j++) {
+              item[j].classList.remove("hidden");
+            }
+          } else {
+            document.getElementById(`sparanet[${i}]`).classList.add("flex");
+            document.getElementById(`img[${i}]`).classList.remove("w-full");
+            document.getElementById(`img[${i}]`).classList.remove("h-[150px]");
+            document.getElementById(`img[${i}]`).classList.add("h-[60px]");
+            // document.getElementById(`img[${i}]`).style.transform = 'scale(0.6)';
+
+            for (let j = 0; j < item.length; j++) {
+              item[j].classList.add("hidden");
+            }
+          }
+        }
+
+        async function deleteDay(dayCard, dayId) {
+          Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              document.getElementById(dayCard).style.display = "none";
+              let res = await fetch(`/trips/deleteday?did=${dayId}`, {
+                method: "post",
+                headers: { "Content-Type": "application/json" },
+              });
+              res = await res.json();
+              if (!res.error) {
+                Swal.fire({
+                  title: "Deleted!",
+                  text: "Your Day has been deleted.",
+                  icon: "success",
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something Went Wrong Try Again",
+                });
+              }
+            }
+          });
+        }
+      </script>
+    </section>
+  </custom-timeline5>
+</div>

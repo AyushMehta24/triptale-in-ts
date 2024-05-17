@@ -1,0 +1,111 @@
+<section class=" bg-contain md:bg-cover" style=" background-image:linear-gradient(rgba(243, 243, 243, 0.13), rgba(255, 255, 255, 0.13)), url(/assets/images/daybyday.jpg)">
+    <div class="header">
+        <h2  style="color: #2077a2; text-align: center; padding-top: 20px;"  class="text-4xl font-extrabold dark:text-black">Add Day by Day Details of the day ...</h2>
+    </div><br><br>
+
+    <div class="container mx-auto" >
+        <form action="/trips/uploadday" method="post" enctype='multipart/form-data' onsubmit=" return validate()"  style="max-width: 1000px;" class="mx-auto" >
+            <input type="hidden" value="<%=tid%>" name="tid">
+            <input type="hidden" value="<%=startDate%>" id="startDate" name="startDate">
+            <input type="hidden" value="<%=endDate%>" id="endDate" name="endDate">
+            <% for( let i = 0; i < repeatDates[0].length; i++ ) { %>
+                <input type="hidden" name="" class="repeatdate"  value="<%= repeatDates[0][i].dates%>">
+            <% } %>
+
+            
+
+
+            <table id="daybyday">
+                <div class="row">
+
+                    <div class="col">
+                        <label for="date"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"  style="font-size: 20px;">Date</label>
+                        <input type="date" id="date" style="opacity: 0.6; background-color: white;  "
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Enter the Date" name="date"       />
+                    </div>
+                    <p class="  validate_of" id="" style="color:red;"> </p>
+                    <p id="dateerror"  style="color: red;"></p><br>
+
+                    <div class="col">
+                        <label for="title"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"  style="font-size: 20px;">Title</label>
+                        <input type="text" id="title" name="title" style=" background-color: white; opacity: 0.6; " 
+                            class="bg-gray-50 border  
+                 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Enter the title"  />
+                    </div>
+                    <p class="  validate_of" id="" style="color:red;"> </p><br>
+
+                    <div class="col">
+                        <label for="description" 
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"  style="font-size: 20px;">Description</label>
+                        <textarea id="description" rows="4" name="description" style=" background-color: white; opacity: 0.6; "
+                            class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Write your description here..."></textarea>
+                    </div>
+                    <p class="  validate_of" id="" style="color:red;"> </p><br>
+
+                    <div class="col">
+                        <label for="location"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"  style="font-size: 20px;">Location</label>
+                        <input type="text" id="location" name="location" style=" background-color: white; opacity: 0.6; "
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Enter the location"  />
+                    </div>
+                    <p class="  validate_of" id="" style="color:red;"> </p><br>
+
+                    <div class="col">
+                        <label for="tripimages" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                            style="font-size: 20px;">Upload day Photo</label>
+
+                        <div class="flex items-center justify-center w-full">
+                            <label for="dropzone-file" style="opacity: 0.6; background-color: white;  "
+                                class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 bg-[lightgray] border-[2px] border-[dotted] border-[black]"
+                                style="background-color: lightgray;">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                                    </svg>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
+                                            class="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400"> PNG, JPG or JPEG  (MAX.
+                                        800x400px)</p>
+                                </div>
+                                <input id="dropzone-file" type="file" class="hidden images"
+                                    style="background-color: lightgray; opacity: 0.6;" name="tripmultiimage" multiple="multiple" />
+                            </label>
+                        </div>
+                        <div class="displayimage"><output class="mt-6"></output></div>
+                        <p id="fileerror" style="color: red;"></p>
+                        <br>
+                    </div>
+                </div>
+            </table>
+            <div class="buttons flex" style="margin-top: 22px;">
+
+                 <input type="submit" id="submit" 
+                        class="text-black bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        value="submit" style="text-align: center;
+                        margin-left: 225px;
+                        min-width: 242px;
+                        cursor: pointer;"> 
+
+                    <a href="/displayTrip/<%=tid%>"><input type="button"
+                            class="text-black bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                            value="Cancel" style="text-align: center; margin-left: 32%;
+                                            min-width: 242px;
+                                            cursor: pointer;">
+                    </a>
+            </div>
+    </div>
+
+    </form>
+    </div>
+</section>
+
+<script src="/js/dayByDay.js" ></script>

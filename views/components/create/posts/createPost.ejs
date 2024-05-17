@@ -1,0 +1,109 @@
+<section class="mx-auto bg-cover  w-full py-4" style="
+    background-image: linear-gradient(
+        rgba(250, 249, 249, 0.8),
+        rgba(250, 248, 248, 0.8)
+      ),
+      url(/assets/loginlayout/1976998.jpg);
+  ">
+  <div class="container mx-auto h-full">
+    <div class="heading mb-4">
+      <h2 class="text-center text-4xl text-[#2e8cff] font-bold head-font">
+        Create Post
+      </h2>
+    </div>
+    <form
+      class="w-[70%] bg-white max-h-[50rem] overflow-y-scroll rounded-md p-8 shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)] mx-auto"
+      action="/posts/insertPost" method="post" id="postForm" enctype="multipart/form-data">
+      <div class="flex items-center flex-col justify-center w-full">
+        <label for="dropzone-file"
+          class="flex flex-col items-center justify-center w-full h-20 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+          <div class="flex flex-col items-center justify-center ">
+            <svg class="w-8  text-gray-500 dark:text-gray-400" aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+            </svg>
+            <p class=" text-sm text-gray-500 dark:text-gray-400 sub-font">
+              <span class="font-semibold">Click to upload</span> 
+              
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 sub-font">
+              SVG, PNG, JPG or JPEG
+            </p>
+          </div>
+          <input id="dropzone-file" type="file" class="hidden images" name="images" multiple="multiple" />
+        </label>
+
+        <output class="mt-3"></output>
+      </div>
+
+      <div class="my-3">
+        <label for="caption" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Caption :</label>
+        <div class="mt-2">
+          <input id="caption" name="caption" type="text"
+            class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sub-font"
+            placeholder="Enter Your Caption" />
+        </div>
+      </div>
+
+      <div class="my-3">
+        <label for="description" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Description
+          :</label>
+        <div class="mt-2">
+          <textarea
+            class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sub-font resize-none"
+            rows="3" placeholder="Enter description" id="description" name="description"></textarea>
+        </div>
+      </div>
+      <div class="my-3 relative">
+        <label for="hashtags " class="block text-sm font-medium leading-6 text-gray-900 sub-font">Hashtags :</label>
+        <div class="mt-2">
+          <ul id="hashtagList" class="[list-style:none] p-0 m-0"></ul>
+          <input id="hashtags" autocomplete="off" list="hashtaglist"
+            class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sub-font"
+            rows="3" placeholder="Enter Hashtags  end press enter one by one" />
+          <datalist id="hashtaglist" class="hashlist z-10 max-h-[170px] overflow-scroll sub-font"></datalist>
+        </div>
+      </div>
+
+      <div class="my-3 relative">
+        <label for="location" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Location :</label>
+        <div class="mt-2">
+          <input id="location" name="location" type="text" autocomplete="off" list="locationlist"
+            class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sub-font"
+            placeholder="Enter Your location" />
+          <datalist id="locationlist" class="locationList z-10 max-h-[170px] overflow-scroll sub-font"></datalist>
+        </div>
+      </div>
+
+      <label for="privacys" class="block mb-2 text-sm font-medium text-gray-900 sub-font">Privacy :</label>
+      <select id="privacys" name="privacy"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 sub-font">
+        <% for( let index = 0; index < privacy.length; index++ ) { %>
+          <option value="<%=privacy[index].id %>"><%=privacy[index].privacy %></option>
+        <% } %>
+      </select>
+
+      <div class="my-3 relative">
+        <label for="peopleTag" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Tag People :</label>
+        <div class="mt-2">
+          <ul id="peopleTagsList" class="[list-style:none] p-0 m-0"></ul>
+          <input id="peopleTag"
+            class="block w-full rounded-md px-3 border-0 py-1.5 ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-indigo-600 ring-gray-300 text-gray-900 shadow-sm  placeholder:text-gray-400   sm:text-sm sm:leading-6 sub-font"
+            placeholder="Search user end select from list" />
+          <ul class="list mt-2 absolute top-30 z-10 mt-2 bg-white w-full max-h-[170px] overflow-y-scroll"></ul>
+        </div>
+      </div>
+
+      <button id="submitPost"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sub-font">
+        Post
+      </button>
+      <a href="/create"
+        class="text-white ml-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-3 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sub-font">
+        Cancel</a>
+    </form>
+  </div>
+</section>
+
+<script src="/js/createPost.js"></script>

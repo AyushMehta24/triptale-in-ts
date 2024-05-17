@@ -1,0 +1,70 @@
+<div class="w-full md:w-3/4 p-4 text-center">
+    <div class="text-left pl-4 pt-3">
+      <span class="text-base text-gray-700 text-2xl mr-2 userName">HiraveSonali</span>
+      <span class="text-base font-semibold text-gray-700 mr-2">      
+        <button
+          class="bg-transparent hover:bg-blue-500 text-gray-700 font-semibold hover:text-white py-2 px-4 border border-gray-600 hover:border-transparent rounded editProfile"
+        >Edit Profile</button>
+      </span>
+      <span class="text-base font-semibold text-gray-700">
+      </span>
+    </div>
+
+    <div class="text-left pl-4 pt-3">
+      <span class="text-base font-semibold text-gray-700 mr-2 postCount">
+        <b>220</b> posts
+      </span>
+      <span class="text-base font-semibold text-gray-700 mr-2">
+        <b>114</b> tag post
+      </span>
+      <span class="text-base font-semibold text-gray-700">
+        <b>200</b> alubums
+      </span>
+    </div>
+
+    <div class="text-left pl-4 pt-3">
+      <span class="text-lg font-bold text-gray-700 mr-2">Sonali Hirave</span>
+    </div>
+
+    <div class="text-left pl-4 pt-3">
+      <p
+        class="text-base font-medium text-blue-700 mr-2"
+      >#graphicsdesigner #traveller #reader #blogger #digitalmarketer</p>
+      <p
+        class="text-base font-medium text-gray-700 mr-2"
+      >https://www.behance.net/hiravesona7855</p>
+    </div>
+  </div>
+
+  <div class="w-full md:w-1/4 p-4 text-center">
+    <div class="w-full relative md:w-3/4 text-center mt-8">
+      <button
+        class="flex rounded-full"
+        id="user-menu"
+        aria-label="User menu"
+        aria-haspopup="true"
+      >
+        <img
+          class="rounded-full h-40"
+          src="/profile/img1.jpeg"
+          alt
+        />
+      </button>
+    </div>
+  </div>
+ <!-- <div class="grid grid-cols-3 gap-2"> -->
+            <!-- <div class="relative">
+              <img class="w-full" src="/profile/img1.jpeg" alt="dummy-image">
+              <button class="absolute top-0 right-0 bg-blue-500 text-white p-2 rounded hover:bg-blue-800 m-2 moreOptionOnAlbums">:</button>
+              <div>
+                <button class="deleteAlbums absolute top-10 right-0 bg-blue-500 text-white p-2 rounded hover:bg-blue-800 m-2 hidden" onclick="deleteAlbumsFromProfile()">delete</button>
+              </div>
+            </div> -->   
+
+  <script>
+      window.onload = fetchDetails
+
+      async function fetchDetails(req ,res){
+        let details = await fetch("/userProfile/fetchDetails")
+      }
+  </script>

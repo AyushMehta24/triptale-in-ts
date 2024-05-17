@@ -1,0 +1,277 @@
+<section>
+  <div
+    class="mx-auto w-[60%] shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)] p-3 mt-4 rounded-lg"
+  >
+    <div class="my-4">
+      <label
+        for="caption"
+        class="block text-lg font-medium leading-6 text-gray-900"
+        >Add Members</label
+      >
+      <div class="mt-2">
+        <ul id="peopleTagsList" class="[list-style:none] p-0 m-0"></ul>
+        <input
+          id="peopleTag"
+          class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          placeholder="Search user end select"
+          style="background-color: lightgray"
+        />
+        <ul class="list mt-2"></ul>
+      </div>
+    </div>
+
+    <table
+      id="table"
+      class="mx-auto bg-white shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)] rounded-lg mt-[20px] p-2 w-[60%]"
+    >
+      <tr>
+        <td class="border p-[15px]">Profile Photo</td>
+        <td class="border p-[15px]">Username</td>
+        <td class="border p-[15px]">Action</td>
+      </tr>
+
+      <%if(numberOfMember !="zero" ){%> <%for(let i=0 ; i< data.length ;i++){%>
+      <tr id="tr[<%=i%>]" class="text-center">
+        <td class="border px-1 py-2 flex items-center justify-center">
+          <img
+            style="height: 70px; width: 70px; border-radius: 50%"
+            src="<%=data[i].profile_image%>"
+            alt=""
+          />
+        </td>
+        <td class="userName border px-1 py-2"><%=data[i].username%></td>
+        <td class="border px-1 py-2">
+          <button
+            class="focus:outline-none text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+            onclick="removeMember(<%=data[i].user_id%> ,'<%=data[i].username%>', <%=i%>)"
+          >
+            Remove
+          </button>
+        </td>
+      </tr>
+
+      <%}%> <%}%>
+    </table>
+    <a
+      href="javascript:history.back()"
+      class="text-white ml-1 bg-[#8F8BE8] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2 text-center"
+    >
+      Back</a
+    >
+  </div>
+</section>
+<script>
+  let socket = io();
+  let tripMembers = [];
+  let userName = document.querySelectorAll(".userName");
+
+  userName.forEach((item) => {
+    tripMembers.push(item.innerText);
+  });
+
+  async function removeMember(deletedId, userName, i) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        if (tripMembers.length != 1) {
+          tripMembers.splice(1, tripMembers.indexOf(userName.trim()));
+        } else {
+          tripMembers.pop();
+        }
+        document.getElementById(`tr[${i}]`).style.display = "none";
+        const res = await fetch(`/trips/editmembers/<%=data[0].trip_id%>`, {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            deletedId: deletedId,
+            tripId: `<%=data[0].trip_id%>`,
+            deleterId: `<%=userId%>`,
+          }),
+        });
+      }
+    });
+  }
+
+  const table = document.getElementById("table");
+  const peopleTagsList = document.getElementById("peopleTagsList");
+  const peopleTag = document.getElementById("peopleTag");
+  let debouncePeopleTag;
+  peopleTag.addEventListener("keydown", async function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+    if (event.key !== "Enter" && peopleTag.value.trim() != "") {
+      clearTimeout(debouncePeopleTag);
+      debouncePeopleTag = setTimeout(async () => {
+        let result = await fetch("/posts/getuserusernames", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userLike: peopleTag.value.trim() }),
+        });
+        responce = await result.json();
+        let sortedNames = responce.userNames;
+        removeElements();
+        if (responce.userNames.length >= 1) {
+          for (let i = 0; i < sortedNames.length; i++) {
+            if (
+              sortedNames[i]
+                .toLowerCase()
+                .startsWith(peopleTag.value.toLowerCase()) &&
+              peopleTag.value != "" &&
+              !tripMembers.includes(sortedNames[i])
+            ) {
+              let listItem = document.createElement("li");
+              listItem.classList.add(
+                "list-items",
+                "flex",
+                "items-center",
+                "mb-1"
+              );
+              listItem.style.cursor = "pointer";
+              listItem.setAttribute(
+                "onclick",
+                "displayNames('" +
+                  sortedNames[i] +
+                  " ',' " +
+                  responce.profileImages[i] +
+                  " ');" +
+                  "addMember('" +
+                  sortedNames[i] +
+                  "')"
+              );
+
+              let image = `<img src="${responce.profileImages[i]}" alt="hello" class="w-[40px] h-[40px] rounded-[50%]" >`;
+              listItem.innerHTML = image;
+              let word =
+                "<b class='ml-2'>" +
+                sortedNames[i].substr(0, peopleTag.value.length) +
+                "</b>";
+              word += sortedNames[i].substr(peopleTag.value.length);
+              listItem.innerHTML += word;
+              document.querySelector(".list").appendChild(listItem);
+            }
+          }
+        } else {
+          document.querySelector(".list").innerHTML =
+            "<li class='list-items'><b>No user found</b></li>";
+        }
+      }, 700);
+    }
+  });
+
+  function displayNames(value, img) {
+    const elementId = new Date().getTime();
+    const table = document.getElementById("table");
+    const tr = document.createElement("tr");
+    tr.id = elementId;
+    tr.classList.add("text-center");
+    const td1 = document.createElement("td");
+    const td2 = document.createElement("td");
+    const td3 = document.createElement("td");
+
+    const removeButton = document.createElement("button");
+    removeButton.innerText = "Remove";
+    removeButton.classList.add("focus:outline-none");
+    removeButton.classList.add("text-white");
+    removeButton.classList.add("bg-red-600");
+    removeButton.classList.add("hover:bg-red-800");
+    removeButton.classList.add("focus:ring-4");
+    removeButton.classList.add("focus:ring-red-300");
+    removeButton.classList.add("font-medium");
+    removeButton.classList.add("rounded-lg");
+    removeButton.classList.add("text-sm");
+    removeButton.classList.add("px-5");
+    removeButton.classList.add("py-2.5");
+    removeButton.classList.add("me-2");
+    removeButton.classList.add("dark:bg-red-600");
+    removeButton.classList.add("dark:hover:bg-red-700");
+    removeButton.classList.add("dark:focus:ring-red-900");
+    removeButton.setAttribute(
+      "onclick",
+      "newMemberRemove('" + value + "' , '" + elementId + "')"
+    );
+    td3.appendChild(removeButton);
+
+    td1.innerHTML = `<img style= "height:70px;width:70px; border-radius: 50%;" src = ${img} >`;
+    td1.classList.add(
+      "border",
+      "px-1",
+      "py-2",
+      "flex",
+      "items-center",
+      "justify-center"
+    );
+    td2.innerText = value;
+    td2.classList.add("border", "px-1", "py-2");
+    td3.classList.add("border", "px-1", "py-2");
+
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    tr.appendChild(td3);
+    table.appendChild(tr);
+    document.getElementById("peopleTag").value = "";
+    tripMembers.push(value.trim());
+    removeElements();
+  }
+
+  function removeElements() {
+    let items = document.querySelectorAll(".list-items");
+    items.forEach((item) => {
+      item.remove();
+    });
+  }
+
+  async function addMember(userName) {
+    const res = await fetch(`/trips/addmembers/<%=data[0].trip_id%>`, {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userName: userName,
+        tripId: `<%=data[0].trip_id%>`,
+      }),
+    });
+    let response = await res.json();
+    notification(response.id, response.data);
+  }
+  async function newMemberRemove(userName, elementId) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      tripMembers.splice(1, tripMembers.indexOf(userName.trim()));
+      document.getElementById(elementId).style.display = "none";
+      const res = await fetch(`/trips/newmemberremove/<%=data[0].trip_id%>`, {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userName: userName,
+          tripId: `<%=data[0].trip_id%>`,
+        }),
+      });
+    });
+  }
+
+  function notification(id, data) {
+    socket.emit("notification-message", {
+      id: id,
+      data: data,
+      content: "",
+      flag: true,
+    });
+    socket.emit("end");
+  }
+</script>

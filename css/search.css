@@ -1,0 +1,56 @@
+#result {
+    position: absolute;
+  padding: 3px;
+
+}
+#result ul {
+  background-color: #d8caca;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#result ul li {
+  padding: 5px 0;
+}
+#result ul li:hover {
+  background: #46b65d;
+}
+
+.result-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important;
+  color: #ffffff;
+}
+
+
+
+/* Trip Location Css */
+
+#result2 {
+  position: absolute;
+padding: 3px;
+overflow-x: scroll;
+cursor: pointer;
+
+}
+#result2 ul {
+background-color:white ;
+
+list-style-type: none;
+padding: 0;
+margin: 0;
+}
+#result2 ul li {
+padding: 5px 0;
+}
+#result2 ul li:hover {
+background: #269ad3;
+opacity: 0.8;
+}
+
+.result2-active {
+/*when navigating through the items using the arrow keys:*/
+background-color: DodgerBlue !important;
+color: #ffffff;
+}
+

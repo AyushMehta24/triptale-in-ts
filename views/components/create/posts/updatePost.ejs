@@ -1,0 +1,121 @@
+<section class="mx-auto   bg-cover w-full   py-10"
+  style="background-image:linear-gradient(rgba(250, 249, 249, 0.623), rgba(250, 248, 248, 0.623)), url(/assets/loginlayout/1976998.jpg)">
+  <div class="container mx-auto">
+    <div class="heading mb-4">
+      <h2 class="text-center font-bold head-font text-6xl text-[#2e8cff]">Update Post</h2>
+    </div>
+    <form
+      class="w-[65%] bg-white rounded-md p-3 shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)] mx-auto"
+      action="/posts/update?id=<%= postId %>" method="post" id="postForm">
+
+      <div class="flex items-center flex-col justify-center w-full">
+        <output class="mt-6">
+          <div class='flex flex-wrap '>
+            <% postImages.forEach(item=> { %>
+              <% if (item.isvideo == 0) { %>
+                <div class="image m-2 bg-[#d3d3d3] p-[10px] rounded-md">
+                  <img src="/posts/<%= item.image %>" class="bg-cover w-[12rem] h-[12rem]" alt="image">
+                </div>
+              <% } %>
+              <% if (item.isvideo == 1) { %>
+                <div class="image m-2 bg-[#d3d3d3] p-[10px] rounded-md">
+                  <video controls class="bg-cover w-[12rem] h-[12rem]">
+                    <source src="/posts/<%= item.image %>" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              <% } %>
+              <% }) %>
+          </div>
+        </output>
+      </div>
+      <div class="my-4">
+        <label for="caption" class="block sub-font text-sm font-medium leading-6 text-gray-900">Caption :</label>
+        <div class="mt-2">
+          <input id="caption" name="caption" type="text" value="<%= postDetail.caption %>"
+            class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sub-font"
+            placeholder="Enter Your Caption">
+        </div>
+      </div>
+
+      <div class="my-4">
+        <label for="caption" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Description :</label>
+        <div class="mt-2">
+          <textarea
+            class="sub-font block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 resize-none"
+            rows="3" placeholder="Enter description" id="description"
+            name="description"><%= postDetail.descriptions %></textarea>
+        </div>
+      </div>
+      <div class="my-4 relative">
+        <label for="caption" class="block sub-font text-sm font-medium leading-6 text-gray-900">Hashtags :</label>
+        <div class="mt-2">
+          <ul id="hashtagList" class="[list-style:none] p-0 m-0">
+            <% if (hashtags.length> 0) { %>
+              <% hashtags.forEach(item=> { %>
+                <li class="inline-block bg-[#f2f2f2] text-[#333] rounded-[20px] px-[10px] py-[5px] mr-[5px] mb-[5px]">
+                  <%= item.name %><input type="hidden" value="<%= item.name %>" name="hashtags[]"><button
+                      class="delete-button bg-transparent border-[none] text-[#999] cursor-pointer ml-[5px]">X</button>
+                </li>
+                <% }) %>
+                  <% } %>
+          </ul>
+          <input id="hashtags" autocomplete="off" list="hashtaglist"
+            class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            rows="3" placeholder="Enter Hashtags end hit enter">
+          <datalist id="hashtaglist"
+            class="hashlist absolute top-30 mt-2 bg-white w-full max-h-[170px] overflow-scroll"></datalist>
+        </div>
+      </div>
+
+      <div class="my-4">
+        <label for="location" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Location :</label>
+        <div class="mt-2">
+          <input id="location" name="location" type="text" value="<%= postDetail.location %>" list="locationlist"
+            autocomplete="off"
+            class="block sub-font w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="Enter Your location">
+          <datalist id="locationlist" class="locationList z-10  max-h-[170px] overflow-scroll"></datalist>
+        </div>
+      </div>
+
+      <label for="privacys" class="block mb-2 text-sm font-medium text-gray-900 ">Privacy :</label>
+      <select id="privacys" name="privacy" data-val="<%= postDetail.privacy_id %>"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <% for( let index = 0; index < privacy.length; index++ ) { %>
+          <option value="<%=privacy[index].id %>"><%=privacy[index].privacy %></option>
+        <% } %>
+      </select>
+
+      <div class="my-4 relative">
+        <label for="caption" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Tag People :</label>
+        <div class="mt-2">
+          <ul id="peopleTagsList" class="[list-style:none] p-0 m-0">
+            <% if (peopleTags.length> 0) { %>
+              <% peopleTags.forEach(item=> { %>
+                <li class="inline-block bg-[#f2f2f2] text-[#333] rounded-[20px] px-[10px] py-[5px] mr-[5px] mb-[5px]">
+                  <%= item.username %><input type="hidden" value="<%= item.username %>" name="peopleTag[]"><button
+                      class="delete-button bg-transparent border-[none] text-[#999] cursor-pointer ml-[5px]">X</button>
+                </li>
+                <% }) %>
+                  <% } %>
+          </ul>
+          <input id="peopleTag" autocomplete="off"
+            class="block w-full sub-font rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="Search user end select">
+          <ul class="list mt-2 absolute top-30 mt-2 bg-white w-full max-h-[170px] overflow-scroll"></ul>
+        </div>
+
+      </div>
+
+      <button id="submitPost"
+        class="text-white    bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sub-font">Update</button>
+      <a href="/userProfile"
+        class="text-white ml-1   bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-3 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sub-font">
+        Cancel</a>
+    </form>
+
+  </div>
+</section>
+
+<script src="/js/createPost.js"></script>

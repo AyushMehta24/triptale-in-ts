@@ -1,0 +1,196 @@
+<section>
+  <div class="flex">
+    <a
+      class="w-48 h-12 mt-5 ml-5 text-center align-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
+      href="/displayTrip/<%=tid%>"
+    >
+      Back
+    </a>
+
+    <div class="flex justify-end mt-5 mr-5 ml-auto">
+      <form
+        action="/trips/addimage"
+        method="post"
+        id="form"
+        enctype="multipart/form-data"
+        onsubmit="return validate()"
+      >
+        <input type="hidden" value="<%=did%>" name="did" />
+        <input type="hidden" value="<%=tid%>" name="tid" />
+
+        <input type="file" name="tripmultiimage" id="tripmultiimage" multiple />
+
+        <input
+          type="submit"
+          id="submit"
+          value="Add Images"
+          class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 h-12 text-center"
+          for="tripmultiimage"
+        />
+        <p id="fileerror" style="color: red"></p>
+      </form>
+    </div>
+  </div>
+  <%if(data.length > 0){%>
+  <p class="text-xl font-semibold tracking-wide capitalize ml-[20px]">Images</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 m-4">
+    <%for(let i=0 ; i < data.length ; i++){ %>
+    <div class="grid gap-4 relative">
+      <img
+        id="img[<%=i%>]"
+        class="rounded-lg h-full"
+        src="/trips/tripImages/<%=data[i].image%>"
+        alt="images"
+        onmouseover="giveCross('cross[<%=i%>]')"
+        onmouseout="removeCross('cross[<%=i%>]')"
+        onclick="showImageInModal('/trips/tripImages/<%=data[i].image%>')"
+      />
+      <div
+        id="cross[<%=i%>]"
+        class="absolute text-2xl hidden w-[30px] h-[30px] text-center cursor-pointer bg-white/50 rounded-[50%] top-[3px] right-[3px]"
+        onclick="removeImg('img[<%=i%>]','<%=data[i].image%>')"
+        onmouseover="giveCross('cross[<%=i%>]')"
+      >
+        X
+      </div>
+    </div>
+    <%}%>
+  </div>
+  <%}%> <%if(video.length > 0){%>
+  <p class="text-xl font-semibold tracking-wide capitalize ml-[20px]">Videos</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 m-4">
+    <%let uniqueId = data.length; for(let i=0 ; i < video.length ;
+    i++,uniqueId++){%>
+    <div class="grid gap-4 relative">
+      <video
+        controlsList="nodownload"
+        id="img[<%=uniqueId%>]"
+        class="rounded-lg h-full"
+        src="/trips/tripImages/<%=video[i].image%>"
+        alt="trip video"
+        onmouseover="giveCross('cross[<%=uniqueId%>]')"
+        onmouseout="removeCross('cross[<%=uniqueId%>]')"
+        width="380"
+        height="250"
+        controls
+      >
+        <source src="/trips/tripImages/<%=video[i].image%>" type="video/mp4" />
+      </video>
+      <div
+        id="cross[<%=uniqueId%>]"
+        class="absolute text-2xl hidden w-[30px] h-[30px] text-center cursor-pointer bg-white/50 rounded-[50%] top-[3px] right-[3px]"
+        onclick="removeImg('img[<%=uniqueId%>]','<%=video[i].image%>')"
+        onmouseover="giveCross('cross[<%=uniqueId%>]')"
+      >
+        X
+      </div>
+    </div>
+    <%}%>
+  </div>
+  <%}%>
+
+  <div
+    id="modal"
+    class="hidden fixed top-0 left-0 z-80 w-screen h-screen bg-black/70 flex justify-center items-center"
+  >
+    <a
+      class="fixed z-90 top-14 right-8 text-white text-5xl font-bold"
+      href="javascript:void(0)"
+      onclick="closeModal()"
+    >
+      x
+    </a>
+    <img id="modal-img" class="max-w-[800px] max-h-[600px] object-cover" />
+  </div>
+
+  <script>
+    function validate() {
+      const maxSize = 50 * 1024 * 1024;
+      const fileName = document.getElementById("tripmultiimage");
+      const selectedFile = document.getElementById("tripmultiimage").files;
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "video/mp4",
+        "video/webm",
+      ];
+      if (fileName.files.length == 0) {
+        document.getElementById("fileerror").innerHTML =
+          "Please select atleast one photo";
+        return false;
+      }
+      if (fileName.files.length > 20) {
+        document.getElementById("fileerror").innerHTML =
+          "You can add maximum 20 images at one time";
+        return false;
+      }
+      for (let i = 0; i < selectedFile.length; i++) {
+        if (selectedFile[i].size > maxSize) {
+          document.getElementById("fileerror").innerHTML =
+            "Photo size should be under 5MB";
+          return false;
+        } else if (!allowedTypes.includes(selectedFile[i].type)) {
+          document.getElementById("fileerror").innerHTML =
+            "Upload Photo in Proper format";
+          return false;
+        } else {
+          document.getElementById("fileerror").innerHTML = "";
+        }
+      }
+    }
+
+    const images = document.querySelectorAll(".grid img");
+    images.forEach(function (img) {
+      img.addEventListener("click", function () {
+        showModal(img.src);
+      });
+    });
+
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modal-img");
+    function showModal(src) {
+      modal.classList.remove("hidden");
+      modalImg.src = src;
+    }
+    function closeModal() {
+      modal.classList.add("hidden");
+    }
+    function giveCross(crossId) {
+      const cross = document.getElementById(crossId);
+      cross.classList.remove("hidden");
+    }
+    function removeCross(crossId) {
+      const cross = document.getElementById(crossId);
+      cross.classList.add("hidden");
+    }
+
+    async function removeImg(imageId, imageName) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          document.getElementById(imageId).parentNode.remove();
+          const res = await fetch(`/trips/removeimage`, {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              imageName: imageName,
+              deleterId: "<%=userId%>",
+            }),
+          });
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      });
+    }
+  </script>
+</section>

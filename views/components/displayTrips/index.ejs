@@ -1,0 +1,204 @@
+<section class="w-[100%]">
+  <div class="dark:bg-gray-100 min-h-screen py-14">
+    <div class="flex ml-[-200px] justify-center">
+      <input
+        type="text"
+        id="search"
+        name="search"
+        class="relative w-[700px] block p-4 ps-10 dark:bg-gray-700 text-sm text-gray-900 border border-gray-300 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Search..."
+        autofocus
+      />
+      <button
+        type="submit"
+        onclick="searchTrip()"
+        class="text-white ml-[-85px] h-[40px] my-auto z-10 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        Search
+      </button>
+    </div>
+    <div
+      class="px-5 grid sm:grid-cols-2 lg:flex items-center justify-center gap-16 lg:gap-28 xl:gap-44 relative min-h-screen"
+    >
+      <div
+        class="relative flex flex-wrap mx-auto justify-center"
+        style="max-width: 100%"
+      >
+        <% for(let i=0 ; i < data.length; i++){ %>
+        <div
+          id="<%=i%>"
+          class="flex tripCard"
+          style="max-width: 700px; padding: 50px 0; position: relative"
+        >
+          <a
+            ><img
+              class="w-full aspect-[3/2] lg:aspect-[3/4] h-44 lg:h-[32rem] object-cover shadow-lg rounded-lg"
+              style="box-shadow: 1px 1px 5px grey"
+              src="/trips/tripcover/<%=data[i].cover_image %>"
+              alt=""
+          /></a>
+          <img
+            id="dot[<%=i%>]"
+            class="cursor-pointer"
+            style="position: absolute; left: 50%; top: 60px; height: 30px"
+            src="/assets/loginlayout/three_dots.png"
+            alt=""
+            onclick="updateBox('smallCard[<%=i%>]')"
+          />
+
+          <div
+            id="smallCard[<%=i%>]"
+            class="hidden w-[125px] absolute text-center top-[100px] left-[300px] z-10 shadow-xl border bg-white"
+          >
+            <a
+              href="/trips/updatetrip?tid=<%=data[i].trip_id%>"
+              class="cursor-pointer"
+              >Update Trip</a
+            >
+            <p
+              id="deleteTrip[<%=i%>]"
+              onclick="deleteTrip('<%=i%>' , '<%=data[i].trip_id%>')"
+              class="cursor-pointer"
+            >
+              Delete Trip
+            </p>
+            <p
+              id="leaveTrip[<%=i%>]"
+              onclick="leaveTrip('<%=i%>' ,'<%=data[i].trip_id%>' )"
+              class="cursor-pointer"
+            >
+              Leave Trip
+            </p>
+            <a
+              href="/insight/tripInsight/<%=data[i].trip_id%>"
+              class="cursor-pointer"
+            >
+              Insights
+            </a>
+          </div>
+
+          <div
+            class="lg:rounded-l-[30px] lg:rounded-t-[30px] bg-white lg:relative top-20 right-60 lg:w-[19rem] px-8 py-6 lg:h-96 shadow text-wrap"
+            style="box-shadow: 1px 1px 5px grey"
+          >
+            <span class="inline-block text-sm text-gray-500">
+              <%=data[i].start_date.getDate() %>-<%=
+              data[i].start_date.getMonth()+1 %>-<%=
+              data[i].start_date.getFullYear() %>
+            </span>
+            <h2
+              class="text-2xl font-bold leading-tight mt-1.5 mb-2.5 break-all tripTitle"
+              style="
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+              "
+            >
+              <%=data[i].title%>
+            </h2>
+            <p
+              class="text-pretty text-gray-800 my-7 leading-relaxed"
+              style="
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+              "
+            >
+              <%=data[i].discription%>
+            </p>
+            <a
+              href="/displayTrip/<%=data[i].trip_id%>"
+              class="flex justify-end items-center uppercase text-blue-800 font-semibold text-sm hover:underline absolute bottom-5 right-8"
+              >read more</a
+            >
+          </div>
+        </div>
+        <% }%>
+      </div>
+    </div>
+  </div>
+  <script>
+    function updateBox(cardId) {
+      document.getElementById(cardId).classList.toggle("hidden");
+    }
+
+    function searchTrip() {
+      const tripCard = document.getElementsByClassName("tripCard");
+      const val = document.getElementById("search").value.trim();
+      const regexp = new RegExp(val, "i");
+
+      for (let i = 0; i < tripCard.length; i++) {
+        tripCard[i].classList.remove("hidden");
+      }
+
+      for (let i = 0; i < tripCard.length; i++) {
+        let tripTtiles = tripCard[i].querySelector(".tripTitle");
+        if (val.length == 0) {
+          tripCard[i].classList.remove("hidden");
+        } else if (!tripTtiles.innerText.toLowerCase().includes(val)) {
+          tripCard[i].classList.add("hidden");
+        }
+      }
+    }
+
+    async function deleteTrip(tripCardId, tripId) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          document.getElementById(tripCardId).style.display = "none";
+          const res = await fetch(`/trips/removetrip`, {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              tripId: tripId,
+              deleterId: "<%=data[0].user_id%>",
+            }),
+          });
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      });
+    }
+
+    async function leaveTrip(tripCardId, tripId) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Leave it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          document.getElementById(tripCardId).style.display = "none";
+          const res = await fetch(`/trips/leavetrip`, {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              tripId: tripId,
+              deleterId: "<%=data[0].user_id%>",
+            }),
+          });
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      });
+    }
+  </script>
+</section>

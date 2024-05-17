@@ -1,0 +1,227 @@
+<section class="bg-gray-100 h-screen">
+    <% if (result && result[0]) { %>
+        <div class="profilePage mx-auto" class="max-w-lg mx-auto" id="mainProfilePage">
+            <!--body start--> <!--profile data-->
+            <div class="bg-gray-100 h-auto px-48">
+                <div class="flex md:flex-row-reverse flex-wrap">
+                    <div class="w-full md:w-3/4 p-4 text-center">
+                        <div class="text-left pl-4 pt-3"> <span
+                                class="text-base text-gray-700 text-2xl mr-2"
+                                id="username">
+                                <%= result[0].username %>
+                            </span> <span
+                                class="text-base font-semibold text-gray-700">
+                                <button
+                                    class="p-1 border-transparent text-gray-700 rounded-full hover:text-blue-600 focus:outline-none focus:text-gray-600"
+                                    aria-label="Notifications">
+                                    <path
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </span> </div>
+                        <% if (result2) { %>
+                            <div class="text-left pl-4 pt-3"> <span
+                                    class="text-base font-semibold text-gray-700 mr-2">
+                                    <b id="postcount">
+                                        <%= Object.keys(result2).length %>
+                                    </b> posts </span>
+                        <% } %>
+                        <% if (result3) { %>
+                         <span
+                                class="text-base font-semibold text-gray-700 mr-2">
+                                <b id="tagpostcount">
+                                    <%= Object.keys(result3).length %>
+                                </b> tag post </span> 
+                        <% } %>
+                    </div>
+                    <div class="text-left pl-4 pt-3"> <span
+                            class="text-lg font-bold text-gray-700 mr-2"
+                            id="fullname">
+                            <%= result[0].first_name %>
+                            <%= result[0].last_name %>
+                        </span> </div>
+                    <div class="text-left pl-4 pt-3">
+                        <p class="text-base font-medium text-blue-700 mr-2"
+                            id="description">
+                            <%= result[0].user_bio %>
+                        </p>
+                        <p class="text-base font-medium text-gray-700 mr-2"
+                            id="social-media-link"></p>
+                    </div>
+                </div>
+                <div
+                    class="w-full md:w-1/4 p-4 flex justify-center items-center">
+                    <div class="w-full relative md:w-3/4 text-center mt-8">
+                        <button
+                            class="flex justify-center items-center rounded-full userProfile"
+                            style="border: 2px solid black;" id="profileimage"
+                            aria-label="User menu" aria-haspopup="true"> <img
+                                class="rounded-full w-28 h-28" id="profile"
+                                src="<%= result[0].profile_image %>"
+                                alt="profileimage" /> </button> </div>
+                </div>
+            </div>
+            <hr class="border-gray-500 mt-6" />
+            <!-- <hr class="border-gray-500 w-20 border-t-1 ml-64 border-gray-800" /> -->
+            <!--post icon and title-->
+            <div class="flex flex-row mt-4 justify-center mr-16">
+                <div
+                    class="flex text-gray-700 text-center py-2 m-2 pr-5 postText border-b-4 border-purple-700">
+                    <div class="flex inline-flex "> <button
+                            class="border-transparent text-gray-800 rounded-full hover:text-blue-600 focus:outline-none focus:text-gray-600"
+                            aria-label="Notifications"> <svg
+                                class="h-6 w-6 posts" fill="none"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
+                            </svg> </button> </div>
+                    <div class="flex inline-flex ml-2 mt-1">
+                        <h3 class="text-sm font-bold text-gray-800 mr-2">POSTS
+                        </h3>
+                    </div>
+                </div>
+                <div
+                    class="flex text-gray-700 text-center py-2 m-2 pr-5 tagText">
+                    <div class="flex inline-flex"> <button
+                            class="border-transparent text-gray-600 rounded-full hover:text-blue-600 focus:outline-none focus:text-gray-600"
+                            aria-label="Notifications"> <svg
+                                class="h-6 w-6 tags" fill="none"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg> </button> </div>
+                    <div class="flex inline-flex ml-2 mt-1">
+                        <h3 class="text-sm font-medium text-gray-700 mr-2">
+                            TAGGED</h3>
+                    </div>
+                </div>
+            </div> <!--post images-->
+            <div class="postImageas "
+                style=" display: grid;      grid-template-columns: 32% 32% 32%;      column-gap: 1%;      row-gap: 20px;">
+                <% if (result2) { %>
+                    <% for (let element in result2) { %>
+                        <div class=" relative  bg-slate-200 border-4 "
+                            style="height: 168px;display: flex;justify-content: center;align-items: center;border: 3px solid black; flex-direction:column; margin:15px 0px">
+                            <% if (result2[element].image.length > 1) { %>
+                                <div> <img class="absolute"
+                                        src="/assets/images/mul.jpeg"
+                                        style="height: 20px;        width: 20px;        margin-left: 103px; top: 10px;        z-index:2">
+                                </div>
+                       
+
+                            <% if (result2[element].isvideo[0] == 0) { %>
+                               
+                                <img class="relative w-full "
+                                       style="height:100%; width:100%; object-fit: fill;"
+                                       onclick="showpost(`<%= result2[element].user_id %>`,`<%= result2[element].id %>`,'post')"
+                                       src="/posts/<%= result2[element].image[0] %>">
+                                   <% }; %>
+                                   <% if (result2[element].isvideo[0] == 1) { %>
+                                       
+                                    <video class="relative w-full "
+                                           style="height:100%; width:100%; object-fit: fill;"
+                                           onclick="showpost(`<%= result2[element].user_id %>`,`<%= result2[element].id %>`,'post')">
+                                           <source
+                                               src="/posts/<%= result2[element].image[0] %>"
+                                               type="video/mp4">
+                                       </video>
+                                       <% }; %>
+                           </div>
+                           <% } else{%>
+                            <% if (result2[element].isvideo[0] == 0) { %>
+                               
+                                <img class="relative w-full "
+                                       style="height:100%; width:100%; object-fit: fill;"
+                                       onclick="showpost(`<%= result2[element].user_id %>`,`<%= result2[element].id %>`,'post')"
+                                       src="/posts/<%= result2[element].image[0] %>">
+                                   <% }; %>
+                                   <% if (result2[element].isvideo[0] == 1) { %>
+                                           <img class="absolute"
+                                           src="/assets/images/vidio.png"
+                                           style="height: 20px;        width: 20px;        top: 10px;     margin-left: 222px;              z-index:2">
+                                       
+                                    <video class="relative w-full "
+                                           style="height:100%; width:100%; object-fit: fill;"
+                                           onclick="showpost(`<%= result2[element].user_id %>`,`<%= result2[element].id %>`,'post')">
+                                           <source
+                                               src="/posts/<%= result2[element].image[0] %>"
+                                               type="video/mp4">
+                                       </video>
+                                       <% }; %>
+            </div>
+                            <% }; %>
+                        <% }; %>
+                        <% } else { %>
+                        <center>
+                            <h1>NO POSTS</h1>
+                        </center>
+                    <% } %>
+            </div>
+            <div class="tagePosts "
+                style=" display: grid;      grid-template-columns: 30% 30% 30%;      column-gap: 5%;      row-gap: 20px;">
+                <% if (result3) { %>
+                    <% for (let element in result3) { %>
+                        <div class=" relative  bg-slate-200 border-4 "
+                            style="height: 168px;display: flex;justify-content: center;align-items: center;border: 3px solid black; flex-direction:column; margin:15px 0px">
+                            <% if (result3[element].image.length > 1) { %>
+                                <div> <img class="absolute"
+                                        src="/assets/images/mul.jpeg"
+                                        style="height: 20px;        width: 20px;      margin-left: 103px; margin-top: 4px;       z-index:2">
+                                </div>
+                          
+                            <% if (result3[element].isvideo[0] == 0) { %>
+                                <img class="relative w-full "
+                                    style="height:100%; width:100%; object-fit: fill;"
+                                    onclick="showpost(`<%= result3[element].user_id %>`,`<%= result3[element].id %>`,'tagPost',`<%= result3[element].profileId %>`)"
+                                    src="/posts/<%= result3[element].image[0] %>">
+                            <% } %>
+                            <% if (result3[element].isvideo[0] == 1) { %>
+                                
+                                <video class="relative w-full "
+                                    style="height:100%; width:100%; object-fit: fill;"
+                                    onclick="showpost(`<%= result3[element].user_id %>`,`<%= result3[element].id %>`,'tagPost',`<%= result3[element].profileId %>`)">
+                                    <source
+                                        src="/posts/<%= result3[element].image[0] %>"
+                                        type="video/mp4">
+                                </video> 
+                            <% } %>
+                        </div>
+                        <% }else{ %>
+
+                            <% if (result3[element].isvideo[0] == 0) { %>
+                                <img class="relative w-full "
+                                    style="height:100%; width:100%; object-fit: fill;"
+                                    onclick="showpost(`<%= result3[element].user_id %>`,`<%= result3[element].id %>`,'tagPost',`<%= result3[element].profileId %>`)"
+                                    src="/posts/<%= result3[element].image[0] %>">
+                            <% } %>
+                            <% if (result3[element].isvideo[0] == 1) { %>
+                                <img class="absolute"
+                                src="/assets/images/vidio.png"
+                                style="height: 20px;        width: 20px; top: 10px;      margin-left: 222;       z-index:2">
+                                <video class="relative w-full "
+                                    style="height:100%; width:100%; object-fit: fill;"
+                                    onclick="showpost(`<%= result3[element].user_id %>`,`<%= result3[element].id %>`,'tagPost',`<%= result3[element].profileId %>`)">
+                                    <source
+                                        src="/posts/<%= result3[element].image[0] %>"
+                                        type="video/mp4">
+                                </video> 
+                                <% } %>
+                            </div>
+
+                            <% }; %>
+                        <% }; %>
+                        <% } else { %>
+                        <center>
+                            <h1>NO POSTS</h1>
+                        </center>
+                    <% } %>
+            </div> <!-- // -->
+        </div>
+    <% } %>
+    <script src="/js/searchseeprofile.js"></script>
+    <script src="/js/homeScript/scrolling.js"></script>
+</section>

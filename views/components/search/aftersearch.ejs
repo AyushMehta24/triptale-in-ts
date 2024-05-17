@@ -1,0 +1,136 @@
+<section class="mt-[25px] mr-[70px]">
+    
+    <form class="max-w-lg mx-auto" autocomplete="off" action="/search" method="post">
+        <label for="default-search"
+            class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+        <div class="relative inline-block" style="width: 506px;">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg class="w-8 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                </svg>
+            </div>
+            <input type="text" id="search" name="search" 
+                class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Search..." oninput="showResults(this.value.trim())" required autofocus value="<%=search%>"/>
+                <div id="result" style="width: 506px;"></div>
+            <input type="submit"
+                class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                value="Search">
+        </div>
+    </form> 
+
+
+<div class="main" style="margin-top: 15px;">
+    <div class="main items-center max-w-lg mx-auto" style="gap: 1px; margin-bottom: 2px;">
+        <div class="justify-center items-center">
+            <div class="flex text-gray-700 text-center py-2 m-2 pr-5 postText border-b-4 border-purple-700">
+                <input type="button" id="location" style="color: green; font-weight: 900;" class="ml-[80px]" value="location" onclick="showlocation()">
+                <input type="button" id="accounts" class="ml-[80px]" value="accounts" onclick="showaccount()">
+                <input type="button" id="tags" class="ml-[80px]" value="tags" onclick="showtags()">
+            </div>
+        </div>
+           <hr>
+        <div id="change" style="margin-top: 15px;">    
+            <div class="max-w-lg mx-auto" style="display: flex;flex-wrap: wrap;">
+                <%result2.forEach(element=> { %>
+                    <div class="inner"  style="width: 169px;height: 168px;display: flex;justify-content: center;align-items: center;border: 1px solid black;"
+                    onclick="post(`<%=element.user_id%>`,`<%=element.post_id%>`)">
+                      <% if(element.isvideo){%>
+                        <video src="posts/<%=element.image%>#t=0,60" style="width:169px;height: 168px;" muted loop autoplay></video>    
+                        <% }else { %>
+                        <img src="posts/<%=element.image%>"  style="width: 167px; height: 140px;"  alt="img">
+                        <% } %>
+                    </div>
+                    <% }); %>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let element = document.getElementById("change");
+    let locations = document.getElementById("location");
+    let accounts = document.getElementById("accounts");
+    let tags = document.getElementById("tags");
+
+
+    function showlocation(){
+            element.innerHTML = `
+            <% if(result2) { %>
+            <div class="main flex items-center max-w-lg mx-auto" style="display: flex;flex-wrap: wrap;">
+                        <%result2.forEach(element => { %>
+                            <div class="inner" style="width: 169px;height: 168px;display: flex;justify-content: center;align-items: center;border: 1px solid black;"
+                            onclick="post(<%=element.user_id%>,<%=element.post_id%>)">
+                            <% if(element.isvideo){%>
+                            <video src="posts/<%=element.image%>#t=0,60" style="width:169px;height: 168px;" muted loop autoplay></video>    
+                            <% }else { %>
+                            <img src="posts/<%=element.image%>"  style="width: 167px; height: 140px;"  alt="img">
+                            <% } %>
+                            </div>
+                            <% }); %>
+                    </div>    
+                    <% }%>`
+            locations.style.color = "Green";
+            accounts.style.color = "black";
+            tags.style.color ="black";   
+            
+            locations.style.fontWeight = "900";
+            accounts.style.fontWeight = "400";
+            tags.style.fontWeight ="400";   
+        }
+        
+        function showaccount(){
+           element.innerHTML =`
+                        <% if(result3 && result3.length!=0) { %>
+                            <%result3.forEach(element => { %>
+                            <div class="inner-trip" style="border: 2px solid black; width: 511px;height: 40px; margin-bottom: 3px;padding-top: 5px;padding-left: 3px;border-radius: 10px;"
+                            >
+                        <p style="margin-left: 5px;color:black;" onclick="account(<%=element.user_id%>)">@<%=element.username%></span>
+                            </div>
+                            <% }); %>
+                        <% }%>`
+
+            locations.style.color = "black";
+            accounts.style.color = "Green";
+            tags.style.color ="black";    
+
+            locations.style.fontWeight = "400";
+            accounts.style.fontWeight = "900";
+            tags.style.fontWeight ="400";   
+        }
+
+        function showtags(){
+            element.innerHTML = `
+            <% if(result) { %>
+            <div class="main flex items-center max-w-lg mx-auto" style="display: flex;flex-wrap: wrap;">
+                        <%result.forEach(element => { %>
+                            <div class="inner" style="width: 169px;height: 168px;display: flex;justify-content: center;align-items: center;border: 1px solid black;"
+                            onclick="post(<%=element.user_id%>,<%=element.post_id%>)">
+                            <% if(element.isvideo){%>
+                            <video src="posts/<%=element.image%>#t=0,60" style="width:169px;height: 168px;" muted loop autoplay></video>    
+                            <% }else { %>
+                            <img src="posts/<%=element.image%>"  style="width: 167px; height: 140px;"  alt="img">
+                            <% } %>
+                            </div>
+                            <% }); %>
+                    </div>    
+                    <% }%>`
+            locations.style.color = "black";
+            accounts.style.color = "black";
+            tags.style.color ="Green";    
+
+            locations.style.fontWeight = "400";
+            accounts.style.fontWeight = "400";
+            tags.style.fontWeight ="900";   
+        }
+        function post(id,id2){
+            window.location.href=`/search/posts?user_id=${id}&post_id=${id2}`;
+        }
+        function account(id){
+            window.location.href=`/search/profile?userid=${id}`;
+        }
+</script>
+<script src="js/searchsuggestion.js"></script>
+
+</section>

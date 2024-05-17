@@ -1,0 +1,184 @@
+<div class="bg-white border border-4 rounded-lg shadow w-full">
+
+  <div class="flex items-start justify-between p-5 border-b rounded-t">
+    <h3 class="text-xl font-semibold">
+     
+      <%=(type=="update")?'Edit':'Add'%> Profile
+     
+    </h3>
+    <button type="button" class="text-gray-400 bg-slate-50 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="product-modal">
+      <% if(type=="update"){ %>
+        <a href="/userProfile"><button type="button" class="text-white bg-slate-400 hover:bg-slate-600 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center">X</button></a>
+    
+        <% } %>
+    </button>
+  </div>
+
+  <div class="p-6 space-y-6">
+    
+
+    <form action="<%=(type=="update")?'/updateProfile':'/addProfile'%>" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+      <div>
+        <label for="file_upload" >
+        <div class="mx-auto w-64 text-center ">
+          <div class="relative w-44">
+          <img class="w-32 h-32 rounded-full " src="<%=(type=="update")?result[0].profile_image:"/profile/avatar.png"%>" alt="" srcset="" id="selectedImage" width="100px" height="100px"/>
+          <div class="p-2 relative" style="margin-top: -50px;margin-left: 120px;">
+            <img src="/assets/images/edit_icon.svg" width="20px" height="20px">
+          </div>
+          <span id="error-file_upload" style="color: red;"></span>
+        </div>
+      </label>
+        </div>
+       
+        <div class="col-span-full" style="display: none;">
+          <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">Cover photo </label>
+          <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+            <div class="text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+              </svg>
+              <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500 ">
+                  <span>Upload a file</span>
+                  <input type="file" id="file_upload" name="file_upload">
+                </label>
+                <p class="pl-1">or drag and drop</p>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="grid grid-cols-6 gap-6">
+        <% if(type!="update"){ %>
+        <div class="col-span-6 sm:col-span-3">
+          <label for="username" class="text-sm font-medium text-gray-900 block mb-2">Username<span className="mt-1 hidden text-sm text-red-400" id="error-username">
+            </span></label>
+          <input type="text" oninput="checkUsername(this)" name="username" id="username" value="<%=type=="update"?result[0].username:""%>" class="field-required shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5" placeholder="Ex:- abc_23">
+        </div>
+        <% }else{ %>
+          <div class="col-span-6 sm:col-span-3">
+            <label for="Email" class="text-sm font-medium text-gray-900 block mb-2">Email</label>
+            <input type="text" name="Email" id="Email" value="<%=type=="update"?result[0].email:""%>" aria-label="disabled input" class="contrast-75 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5 cursor-not-allowed" disabled>
+          </div>
+          <% } %>
+        <div class="col-span-6 sm:col-span-3">
+          <label for="first_name" class="text-sm font-medium text-gray-900 block mb-2">Firstname<span className="mt-1 hidden text-sm text-red-400" id="error-first_name"></span></label>
+          <input type="text" name="first_name" id="first_name" value="<%=type=="update"?result[0].first_name:""%>" class="field-required shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5" placeholder="Ex:- jyot">
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+          <label for="last_name" class="text-sm font-medium text-gray-900 block mb-2">Lastname<span className="mt-1 hidden text-sm text-red-400" id="error-last_name"></span></label>
+          <input type="text" name="last_name" id="last_name" value="<%=type=="update"?result[0].last_name:""%>" class="field-required shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5" placeholder="Ex:- khant">
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+
+          <label for="user_bio" class="text-sm font-medium text-gray-900 block mb-2">About</label>
+          <input type="text" id="user_bio" name="user_bio" rows="3" value="<%=type=="update"?result[0].user_bio:""%>" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5" placeholder="">
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+          <label for="user_dob" class="text-sm font-medium text-gray-900 block mb-2">Dob<span className="mt-1 hidden text-sm text-red-400" id="error-user_dob"></span></label>
+          <input type="text" name="user_dob" id="user_dob" value="<%=type=="update"?(new Date(result[0].user_dob)).toISOString().split('T')[0]:""%>" class="field-required shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5" placeholder="Ex:- YYYY-MM-DD">
+
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+          <label for="price" class="text-sm font-medium text-gray-900 block mb-2">Gender</label>
+          <input <%=type=="update"?result[0].gender=="male"?"checked":"":"checked"%> id="inline-radio" type="radio" name="gender" value="male" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+          <label for="inline-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Male</label>
+
+          <input <%=type=="update"?result[0].gender=="female"?"checked":"":""%> id="inline-2-radio" type="radio" name="gender" value="female" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+          <label for="inline-2-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Female</label>
+
+          <input <%=type=="update"?result[0].gender=="other"?"checked":"":""%> id="inline-checked-radio" type="radio" name="gender" value="other" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+          <label for="inline-checked-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Other</label>
+        </div>
+        <% if(type!="update") {%>
+        <div class="col-span-full mb-5">
+          <div class="my-3 relative">
+            <label for="userInterests" class="block text-sm font-medium leading-6 text-gray-900 sub-font">Interests :</label>
+            <div class="mt-2">
+              <ul id="userInterestsList" class="[list-style:none] p-0 m-0"></ul>
+              <input id="userInterests" autocomplete="off" 
+                class="block w-full rounded-md px-3 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sub-font"
+                rows="3" placeholder="Enter Interests end hit enter" />
+              <datalist id="userInterestsList" class="interestlist z-10 max-h-[170px] overflow-scroll sub-font"></datalist>
+            </div>
+          </div>
+        </div>
+        <% } %>
+        <div class="col-span-full ">
+          <% if(type=="update") {%>
+            <div>
+              <input type="hidden" name="filename" value="<%=result[0].profile_image%>">
+              <button type="button" class="mb-5 text-white bg-gray-400 hover:bg-gray-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center" onclick="changeCombo('combo',<%=result[0].city_id%>)">Change a location</button>
+            </div>
+            <%}%>
+          <div class="flex" id="combo" style="gap:20px">  
+
+            <div class="mx-15 countries" id="main-countries">
+
+              <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an
+                countries <span className="mt-1 hidden text-sm text-red-400" id="error-countries"></span></label>
+              <select id="countries" onchange="change_combo('countries',this,'state')" class="mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              </select>
+            </div>
+
+            <div class="mr-4 state" id="main-state" style="margin-right: 15px; display: none;" >
+
+              <label for="state" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an
+                state <span className="mt-1 hidden text-sm text-red-400" id="error-state"></span></label>
+              <select id="state" onchange="change_combo('state',this,'city')" class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+
+              </select>
+            </div>
+
+            <div class="mx-15 city" style="display: none;" id="main-city">
+
+
+              <label for="city" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an
+                city <span className="mt-1 hidden text-sm text-red-400" id="error-city"></span></label>
+              <select id="city" name="city_id" class="field-required bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+
+                <option value="<%=(type=="update")?result[0].city_id:""%>" hidden></option>
+
+              </select>
+            </div>
+          </div>
+         
+    <div id="submitButton">
+            <button class="text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">Save</button>
+          </div>
+        </div>
+        </div>
+      </div>
+  </div>
+  
+  </form>
+</div>
+
+
+</div>
+
+
+
+
+<script src="/js/bioProfile.js"></script>
+<script>
+  let type = "<%-type%>"
+  if (type == "update") {
+    
+    document.getElementById('combo').style.display = "none"
+
+    function changeCombo(id,city_id) {
+if(document.getElementById('combo').style.display == "none"){
+  document.getElementById('combo').style.display = ""
+}else{
+  document.getElementById('combo').style.display = "none"
+  document.getElementById('city').innerHTML=`<option value=${city_id} hidden></option>`
+}
+      
+    }
+
+  }
+</script>
