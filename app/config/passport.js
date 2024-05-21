@@ -10,11 +10,11 @@ const cookieExtractor = function (req) {
 };
 
 const passport = (passport) => {
-       opts = {
+  let opts = {
     jwtFromRequest: cookieExtractor,
-    secretOrKey: process.env.SECRET_KEY,
+    secretOrKey: "welcome",
   };
-  
+
   passport.use(
     new JwtStrategy(opts, async function (jwt_payload, done) {
       try {
