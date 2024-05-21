@@ -1,16 +1,29 @@
-const conn = require("../config/mysql_connection");
-const logger = require("../config/logger");
+import conn from "../config/mysql_connection";
+import logger from "../config/logger";
+import { Request, Response } from "express";
+import { UserId } from "../../index";
+import { ProfileImage } from "../../index";
+import {
+  getUsersUserNameInterface,
+  postDetailInterface,
+  getHashTagInterface,
+  insertPostImage,
+  idForuser,
+  useridForuser,deletePost
+} from "../../dto/postControllerInterface";
+import { QueryResult, ResultSetHeader } from "mysql2";
+
 const postController = () => {
   return {
-    async getUsersUserName(req, res) {
+    async getUsersUserName(req: Request, res: Response) {
       try {
-        let userNames = [];
-        let profileImages = [];
-        let result = await conn.query(
+        let userNames: Array<string> = [];
+        let profileImages: Array<string> = [];
+        let result: Array<getUsersUserNameInterface> = (await conn.query(
           `select userName,profile_image from user_profiles where userName like ?  and NOT user_id = ?`,
-          [`${req.body.userLike}%`, req.user.userId]
-        );
-        result[0].forEach((item) => {
+          [`${req.body.userLike}%`, (req.user as UserId).userId]
+        )) as unknown as Array<getUsersUserNameInterface>;
+        result.forEach((item: getUsersUserNameInterface): void => {
           userNames.push(item.userName);
           profileImages.push(item.profile_image);
         });
@@ -20,15 +33,15 @@ const postController = () => {
         return res.json({ error: error });
       }
     },
-    async getHashTags(req, res) {
+    async getHashTags(req: Request, res: Response) {
       try {
-        let hashtagNames = [];
-        let result = await conn.query(
+        let hashtagNames: Array<string> = [];
+        let result: Array<getHashTagInterface> = (await conn.query<QueryResult>(
           `select name from hashtags where name like ?`,
           [`#${req.body.hashtagLike}%`]
-        );
+        )) as unknown as Array<getHashTagInterface>;
 
-        result[0].forEach((item) => {
+        result.forEach((item: getHashTagInterface): void => {
           hashtagNames.push(item.name);
         });
         return res.json(hashtagNames);
@@ -37,12 +50,16 @@ const postController = () => {
         return res.json({ error: error });
       }
     },
-    async insertPost(req, res) {
+    async insertPost(req: Request, res: Response) {
       try {
         await conn.beginTransaction();
+
+        if (!req.files) {
+          throw new Error("No image uploaded");
+        }
         //post detail insert
-        let postDetail = {
-          user_id: req.user.userId,
+        let postDetail: postDetailInterface = {
+          user_id: (req.user as UserId).userId,
           location: req.body.location.trim().slice(0, 30),
           privacy_id: req.body.privacy,
           ismultiple: req.files.length > 1 ? 1 : 0,
@@ -59,43 +76,48 @@ const postController = () => {
         ) {
           postDetail["descriptions"] = req.body.description.trim();
         }
-        let result = await conn.query("INSERT INTO posts SET ?", postDetail);
+        let result = await conn.query<ResultSetHeader>(
+          "INSERT INTO posts SET ?",
+          postDetail
+        );
         const postId = result[0].insertId;
 
         //post image insert
-        const extention = process.env.VIDEO_EXTENSION;
+        const extention: Array<string> = ["webm", "mp4"];
         try {
-          req.files.forEach(async (item) => {
-            let image = {
+          req.files.forEach(async (item: ProfileImage) => {
+            let image: insertPostImage = {
               post_id: postId,
               image: item.path.split("/").splice(2).join("/"),
-              isvideo: extention.includes(item.path.split(".").pop()) ? 1 : 0,
+              isvideo: extention.includes(item.path.split(".").pop() || "")
+                ? 1
+                : 0,
             };
             result = await conn.query("INSERT INTO post_images SET ?", image);
           });
         } catch (error) {
           logger.error(error);
         }
-        
+
         //post hashtag insert
         if (req.body.hashtags) {
-          req.body.hashtags.forEach(async (item) => {
+          req.body.hashtags.forEach(async (item: string) => {
             try {
-              let hashtagId = await conn.query(
+              let hashtagId: Array<idForuser> = (await conn.query<QueryResult>(
                 `SELECT id FROM hashtags WHERE name = ?`,
                 [item]
-              );
-              if (hashtagId[0].length == 1) {
+              )) as unknown as Array<idForuser>;
+              if (hashtagId.length == 1) {
                 let result = await conn.query(
                   `INSERT INTO post_hashtags (post_id, tag)
                 VALUES (?,?) ON DUPLICATE KEY UPDATE isdeleted = null`,
-                  [postId, hashtagId[0][0].id]
+                  [postId, hashtagId[0].id]
                 );
               } else {
-                let newHashtag = {
+                let newHashtag: { name: string } = {
                   name: item,
                 };
-                let result = await conn.query(
+                let result = await conn.query<ResultSetHeader>(
                   "INSERT INTO hashtags SET ?",
                   newHashtag
                 );
@@ -113,16 +135,16 @@ const postController = () => {
 
         // post people tag insert
         if (req.body.peopleTag) {
-          req.body.peopleTag.forEach(async (item) => {
+          req.body.peopleTag.forEach(async (item: string) => {
             try {
-              let userId = await conn.query(
+              let userId: Array<useridForuser> = (await conn.query<QueryResult>(
                 `SELECT user_id FROM user_profiles  WHERE userName = ?`,
                 [item]
-              );
-              if (userId[0].length == 1) {
+              )) as unknown as Array<useridForuser>;
+              if (userId.length == 1) {
                 let result = await conn.query(
                   `INSERT INTO post_people_tags (post_id,user_id) VALUES (?,?) ON DUPLICATE KEY UPDATE isdeleted = null`,
-                  [postId, userId[0][0].user_id]
+                  [postId, userId[0].user_id]
                 );
               }
             } catch (error) {
@@ -138,22 +160,22 @@ const postController = () => {
         return res.redirect("/error");
       }
     },
-    async deletePost(req, res) {
+    async deletePost(req:Request, res:Response) {
       try {
         const postId = req.body.postId;
         if (!/^\d+$/.test(postId)) {
           return res.status(500).json({ error: true });
         }
-        let result = await conn.query(
+        let result:Array<deletePost> = await conn.query(
           `SELECT EXISTS(SELECT * FROM posts WHERE id = ? and user_id = ?) as isexists`,
-          [postId, req.user.userId]
-        );
-        if (result[0][0].isexists) {
-          result = await conn.query(
+          [postId, (req.user as UserId).userId]
+        )as unknown as Array<deletePost>;
+        if (result[0].isexists) {
+         const result1 = await conn.query<ResultSetHeader>(
             `update posts set isdeleted = CURRENT_TIMESTAMP where id = ?`,
             [postId]
           );
-          if (result[0].affectedRows == 1) {
+          if (result1[0].affectedRows == 1) {
             return res.status(200).json({ error: false });
           }
         } else {
