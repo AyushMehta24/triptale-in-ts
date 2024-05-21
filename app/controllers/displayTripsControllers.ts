@@ -235,3 +235,5 @@ const allTrips: TripController = {
     }
   },
 };
+
+export default allTrips;

@@ -1,54 +1,52 @@
-const web = require("express").Router();
-const passport = require("passport");
-const posts = require("./posts");
-require("../app/config/passport")(passport);
-const userProfile = require("./userProfile");
-
-const bioProfile=require('../app/middlewares/validation/bioProfile')
-
-const authController = require("../app/controllers/authController");
-const mainController = require("../app/controllers/mainController");
-const guest = require("../app/middlewares/guest");
-const RegisterLogin = require("../app/middlewares/validation/registerLogin");
-
-const comboController = require("../app/controllers/comboController");
-
-const createtrip = require("./createtrip");
-const searchcontroller = require("./search");
-const create = require("./create");
-const { profileUpload } = require("../app/middlewares/profileImageUpload");
-const {
+import { Router, Request, Response } from "express";
+import passport from "passport";
+import posts from "./posts";
+import userProfile from "./userProfile";
+import bioProfile from "../app/middlewares/validation/bioProfile";
+import authController from "../app/controllers/authController";
+import mainController from "../app/controllers/mainController";
+import guest from "../app/middlewares/guest";
+import RegisterLogin from "../app/middlewares/validation/registerLogin";
+import comboController from "../app/controllers/comboController";
+import createtrip from "./createtrip";
+import searchcontroller from "./search";
+import create from "./create";
+import { profileUpload } from "../app/middlewares/profileImageUpload";
+import {
   firstTimeLogin,
   checkIsProfileFill,
-} = require("../app/middlewares/validation/firstTimeLogin");
-const home = require("./homeRoutes/home");
+} from "../app/middlewares/validation/firstTimeLogin";
+import home from "./homeRoutes/home";
+import app from "./displayTrip";
 
-const { app } = require("./displayTrip");
+const web = Router();
 
 web.get(
   "/",
   passport.authenticate("jwt", { session: false, failureRedirect: "/login" }),
   checkIsProfileFill,
-  mainController().getMain
+  (req: Request, res: Response) => {
+    mainController.getMain(req, res);
+  }
 );
 
 web.get("/login", guest, authController().getLoginForm);
-web.post("/login",RegisterLogin, authController().loginUser);
+web.post("/login", RegisterLogin, authController().loginUser);
 web.get("/register", guest, authController().getRegisterForm);
 web.post("/register", RegisterLogin, authController().registerUser);
 web.get("/activateuser", authController().activeUser);
 web.get("/forgotpassword", guest, authController().getForm);
 web.post("/forgotpassword", authController().forgotForm);
 web.get("/changepassword", authController().getUpdatePassForm);
-web.post("/changepassword",RegisterLogin, authController().UpdatePass);
-web.get("/sessionexpired", (req, res) => {
+web.post("/changepassword", RegisterLogin, authController().UpdatePass);
+web.get("/sessionexpired", (req: Request, res: Response) => {
   res.send("change Password Session Expired");
 });
 
 web.use(
   passport.authenticate("jwt", { session: false, failureRedirect: "/login" })
 );
-web.get("/profile", firstTimeLogin, (req, res) => {
+web.get("/profile", firstTimeLogin, (req: Request, res: Response) => {
   res.render("components/auth/profileDetails", {
     layout: "layouts/bioProfile",
     type: "",
@@ -71,41 +69,34 @@ web.use(checkIsProfileFill);
 web.use("/posts", posts);
 web.use("/home", home);
 web.use("/search", searchcontroller);
-//trip display ayush f6
 web.use("/displayTrip", app);
-// create trip
 web.use("/trips", createtrip);
 web.use("/create", create);
 web.use("/userProfile", userProfile);
-web.get("/", mainController().getMain);
+web.get("/", mainController.getMain);
 
 web.post(
   "/updateProfile",
   profileUpload.single("file_upload"),
-  bioProfile
-  ,
+  bioProfile,
   authController().UpdateProfile
 );
 web.get("/getProfile", authController().GetProfile);
-
-//forgot password
-
-//search section
 
 web.use("/insight", require("./insight"));
 
 web.use("/notification", require("./notification"));
 web.get("/resetpassword", authController().GetResetPasswordForm);
-web.post("/resetpassword",RegisterLogin, authController().resetPassword);
-web.get("/logout", (req, res) => {
+web.post("/resetpassword", RegisterLogin, authController().resetPassword);
+web.get("/logout", (req: Request, res: Response) => {
   res.clearCookie("token");
   res.redirect("/login");
 });
-web.get("/error",(req,res)=>{
-  res.render("components/error",{layout:"layouts/bioProfile"})
-})
-web.get("*", (req, res) => {
+web.get("/error", (req: Request, res: Response) => {
+  res.render("components/error", { layout: "layouts/bioProfile" });
+});
+web.get("*", (req: Request, res: Response) => {
   res.render("components/404", { layout: "layouts/bioProfile" });
 });
 
-module.exports = web;
+export default web;

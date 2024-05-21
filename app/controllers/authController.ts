@@ -517,7 +517,7 @@ const authController = () => {
           });
         }
       } catch (error) {
-        logger.log("Auth Controller resetPassword: " , error);
+        logger.log("Auth Controller resetPassword: ", error);
         return res.send({
           success: false,
           alert: "Something Went Wrong Try Again",
@@ -526,3 +526,5 @@ const authController = () => {
     },
   };
 };
+
+export default authController;

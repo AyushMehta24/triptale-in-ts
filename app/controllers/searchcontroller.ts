@@ -13,7 +13,7 @@ import {
 } from "../../dto/searchControllerInterface";
 import { QueryResult } from "mysql2";
 import { UnknownFieldInstance } from "express-validator/src/base";
-import { QueryError } from "sequelize";
+// import { QueryError } from "sequelize";
 import { accumalator } from "../../dto/notificationControllerInterface";
 interface Post {
   id?: number;
@@ -50,15 +50,15 @@ interface query3Interface {
   ismultiple?: number;
   image: Array<string> | string;
   isvideo: Array<number> | number;
-  profileId?: number ;
+  profileId?: number;
 }
 
-interface query3Result{
+interface query3Result {
   id: string;
   user_id: number;
   image: Array<string> | string;
   isvideo: Array<number> | number;
-  profileId?: number ;
+  profileId?: number;
 }
 
 interface postAcc {
@@ -336,4 +336,4 @@ const searchcontroller = () => {
   };
 };
 
-module.exports = searchcontroller;
+export default searchcontroller;

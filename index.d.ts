@@ -1,4 +1,4 @@
-interface ProfileImage {
+export interface ProfileImage {
   fieldname: string;
   originalname: string;
   encoding: string;
@@ -19,7 +19,7 @@ declare global {
     interface Request {
       file?: ProfileImage;
       user?: UserId;
-      files?:Array<ProfileImage>
+      files?: Array<ProfileImage>;
     }
   }
 }

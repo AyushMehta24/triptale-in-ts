@@ -53,10 +53,10 @@ const comboController: () => ComboController = () => {
 
     async checkUsername(req: Request, res: Response) {
       try {
-        let result:Array<Array<combo>>  = await conn.query<QueryResult>(
+        let result: Array<Array<combo>> = (await conn.query<QueryResult>(
           `SELECT * FROM user_profiles where username=?`,
           [req.body.username]
-        ) as unknown as Array<Array<combo>>;
+        )) as unknown as Array<Array<combo>>;
 
         if (result[0].length == 0) {
           res.json({ isExists: false });
@@ -70,3 +70,5 @@ const comboController: () => ComboController = () => {
     },
   };
 };
+
+export default comboController;
