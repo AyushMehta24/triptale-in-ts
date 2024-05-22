@@ -1,7 +1,6 @@
-const conn = require("../../config/mysql_connection");
-const homeController = require("../../controllers/homeControllers/homeController");
 
-async function firstTimeLogin(req, res, next) {
+import conn from "../../config/mysql_connection"
+export async function firstTimeLogin(req, res, next) {
     let result = await conn.query(
         `select * from user_profiles where user_id = ?`
       ,[req.user.userId]);
@@ -14,7 +13,7 @@ async function firstTimeLogin(req, res, next) {
 }
 
 
-async function checkIsProfileFill(req, res, next) {
+export async function checkIsProfileFill(req, res, next) {
   let result = await conn.query(
       `select * from user_profiles where user_id = ?`
     ,[req.user.userId]);
@@ -26,4 +25,3 @@ async function checkIsProfileFill(req, res, next) {
      
     }
 }
-module.exports = {firstTimeLogin,checkIsProfileFill};
