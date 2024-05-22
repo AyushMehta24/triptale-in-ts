@@ -429,7 +429,6 @@ const authController = () => {
           req.file.filename
         }`;
       }
-      console.log(req.body.gender);
       try {
         let update = await conn.query(
           `UPDATE user_profiles SET first_name = ?,last_name = ?,user_bio =?,user_dob = ?,city_id =?,profile_image =?,gender=? WHERE user_id = ?`,

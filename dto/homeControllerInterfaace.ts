@@ -8,11 +8,11 @@ export interface getHomeInterface {
   profile_image: string;
   like_count: number;
   comment_count: number;
-  isdeleted: number;
+  isdeleted?: number;
   caption: string;
   create_at: number | string;
   privacy: string;
-  isvideo: Array<number>;
+  isvideo: number;
   flag?: string;
   save_posts?: string;
 }
@@ -21,7 +21,7 @@ export interface getHomeInterfacePart {
   id: number;
   userId: number;
   username: string;
-  image: string;
+  image: Array<string>;
   ismultiple: number;
   location: string;
   profile_image: string;
@@ -33,13 +33,14 @@ export interface getHomeInterfacePart {
   flag: Number;
   save_posts: number | null;
   isvideo: Array<number>;
+
 }
 
 export interface getHomeInterfaceAcc {
   [x: string]: getHomeInterfacePart;
 }
 
-export interface getProfile {
+export interface getProfileInterface {
   profile_image: string;
   user_id: number;
 }

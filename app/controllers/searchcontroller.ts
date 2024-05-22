@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import connection from "../config/mysql_connection";
 import logger from "../config/logger";
-import homefunc from "./homeControllers/homeController";
+import * as homefunc from "./homeControllers/homeController";
 import { UserId } from "../../index";
 import {
   uniqueUsername,
@@ -164,7 +164,7 @@ const searchcontroller = () => {
 
       if (count_q[0].counter == 1) {
         try {
-          const result: Array<Post> = (await homefunc().getHome(
+          const result: Array<Post> = (await homefunc.getHome(
             req
           )) as unknown as Array<Post>;
 

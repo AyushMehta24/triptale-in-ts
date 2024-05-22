@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-const logger = require("../config/logger");
-const conn = require("../config/mysql_connection");
 import { UserId } from "../../index";
-
+import logger from "../config/logger";
+import conn from "../config/mysql_connection";
+import { QueryResult } from "mysql2";
 const tripDetailsProtect = async (
   req: Request,
   res: Response,
@@ -30,7 +30,7 @@ const tripDetailsProtect = async (
     `;
 
     // Execute the query
-    const [result] = await conn.query(sql, [userId, tid]);
+    const [result]:Array<Array<object>> = await conn.query<QueryResult>(sql, [userId, tid]) as unknown as Array<Array<object>>;
 
     // If the user has access, call the next middleware
     if (result.length > 0) {
@@ -47,4 +47,4 @@ const tripDetailsProtect = async (
   }
 };
 
-module.exports = tripDetailsProtect;
+export default tripDetailsProtect;

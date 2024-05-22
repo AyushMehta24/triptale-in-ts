@@ -68,10 +68,10 @@ const allTrips: TripController = {
 
       const sql =
         "SELECT trip_details.cover_image, trip_details.trip_id, trip_details.start_date, trip_details.title, trip_details.discription, trip_members.user_id FROM trip_members JOIN trip_details ON trip_details.trip_id = trip_members.trip_id WHERE trip_members.user_id = ? AND trip_members.deleted_at IS NULL AND trip_details.deleted_at IS NULL";
-      const result: Array<tripInfo> = (await connection.query<QueryResult>(
+      const [result]: Array<Array<tripInfo>> = (await connection.query<QueryResult>(
         sql,
         userId
-      )) as unknown as Array<tripInfo>;
+      )) as unknown as Array<Array<tripInfo>>;
       if (result.length === 0) {
         const message = "No Trips To Show...";
         const errorType = "NoTrips";
@@ -102,10 +102,10 @@ const allTrips: TripController = {
 
       //event details
 
-      const result1: Array<tripDetails> = (await connection.query(sql1, [
+      const [result1]: Array<Array<tripDetails>> = (await connection.query(sql1, [
         userId,
         tripId,
-      ])) as unknown as Array<tripDetails>;
+      ])) as unknown as Array<Array<tripDetails>>;
       if (result1.length === 0) {
         const sql = `SELECT trip_details.trip_id, trip_details.title as mainTitle, trip_details.discription as mainDiscription FROM trip_details join trip_members on trip_details.trip_id = trip_members.trip_id WHERE trip_members.user_id = ? AND trip_details.deleted_at is NULL AND trip_details.trip_id = ? AND trip_members.deleted_at is NULL ;`;
 

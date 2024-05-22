@@ -1,9 +1,12 @@
-const logger = require("../../config/logger");
-const connection = require("../../config/mysql_connection");
+import logger from "../../config/logger";
+import connection from "../../config/mysql_connection";
+import { UserId } from "../../../index";
+import { Request, Response } from "express";
+import { QueryResult, ResultSetHeader } from "mysql2";
+import { Result } from "express-validator";
 
-const getUserInfo = () => {
-  return {
-    async getLikedBy(req, res) {
+
+    export async function  getLikedBy(req:Request, res:Response) {
       try {
         const id = req.body.postId;
         const likedByUsers =
@@ -14,12 +17,12 @@ const getUserInfo = () => {
         return res.status(200).json({ data: result });
       } catch (error) {
         logger.error(
-          "likeCommentController getLikedBy function: " + error.message
+          "likeCommentController getLikedBy function: " + error
         );
       }
-    },
+    }
 
-    async getCommentBy(req, res) {
+    export async function  getCommentBy(req:Request, res:Response) {
       try {
         const id = req.body.postId;
 
@@ -32,17 +35,16 @@ const getUserInfo = () => {
         const [allReplyRes] = await connection.query(allReplyQuery, id);
         return res
           .status(200)
-          .json({ data: result, logedUserId: req.user.userId, allReply: allReplyRes });
+          .json({ data: result, logedUserId: (req.user as UserId).userId, allReply: allReplyRes });
       } catch (error) {
         logger.error(
-          "likeCommet Controller getCommentBy function: " + error.message
+          "likeCommet Controller getCommentBy function: " + error
         );
       }
-    },
-
-    async getComment(req, res) {
+    }
+    export async function  getComment(req:Request, res:Response) {
       try {
-        const userId = req.user.userId;
+        const userId = (req.user as UserId).userId;
         const postId = req.body.postId;
         const comment = req.body.comment;
 
@@ -57,7 +59,7 @@ const getUserInfo = () => {
         const updateCommentCount =
           "update posts set comment_count = comment_count + 1 where id = ? ";
 
-        const [result] = await connection.query(storeComment, data);
+        const result = await connection.query<ResultSetHeader>(storeComment, data);
         await connection.query(updateCommentCount, [postId]);
 
         const lastComment =
@@ -65,22 +67,22 @@ const getUserInfo = () => {
 
         const [lastCommentRes] = await connection.query(lastComment, [
           postId,
-          result.insertId,
+          result[0].insertId,
         ]);
 
         return res.status(200).json({
           status: 200,
           lastComment: lastCommentRes,
-          logedUserId: req.user.userId,
+          logedUserId: (req.user as UserId).userId,
         });
       } catch (error) {
         logger.error(
-          "likeCommet Controller getComment function: " + error.message
+          "likeCommet Controller getComment function: " + error
         );
       }
-    },
+    }
 
-    async removeComment(req, res) {
+    export async function  removeComment(req:Request, res:Response) {
       try {
         const id = req.body.commentId;
   
@@ -90,10 +92,7 @@ const getUserInfo = () => {
         await connection.query(dltCommentquery, id);
         await connection.query(updateCommentCount, req.body.postId);
       } catch (error) {
-        logger.error("home controller removeComment function: "+ error.message)
+        logger.error("home controller removeComment function: "+ error)
       }
-    },
-  };
-};
+    }
 
-module.exports = getUserInfo;

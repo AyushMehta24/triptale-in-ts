@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import mainController from "../../app/controllers/mainController";
-import homeController from "../../app/controllers/homeControllers/homeController";
-import getUserInfo from "../../app/controllers/homeControllers/likeCommenController";
-import onePostDetails from "../../app/controllers/homeControllers/postDetailsController";
-import replyController from "../../app/controllers/homeControllers/replyCommentController";
+import * as homeController from "../../app/controllers/homeControllers/homeController";
+import * as getUserInfo from "../../app/controllers/homeControllers/likeCommenController";
+import * as onePostDetails from "../../app/controllers/homeControllers/postDetailsController";
+import * as replyController from "../../app/controllers/homeControllers/replyCommentController";
 
 const home = express.Router();
 
