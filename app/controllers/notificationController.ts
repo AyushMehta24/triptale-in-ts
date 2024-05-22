@@ -8,9 +8,9 @@ import {
   accumalator,
   multiPostItem,
   notificationType,
-  postData,postimages,
+  postData,
+  postimages,
 } from "../../dto/notificationControllerInterface";
-import { UnknownConstraintError } from "sequelize";
 
 interface NotificationController {
   postUserId(req: Request, res: Response): Promise<void>;
@@ -61,12 +61,13 @@ const notificationController: NotificationController = {
 
   async getNotification(req, res) {
     try {
-      const resultPost:Array<multiPostItem> = await conn.query<QueryResult>(
+      const resultPost: Array<multiPostItem> = (await conn.query<QueryResult>(
         `SELECT notification.id, notification.create_at, isvideo, notification.like_by, notification.user_id, notification.post_id, notification.content, post_images.image, username, profile_image, first_name, last_name FROM notification INNER JOIN user_profiles ON notification.like_by = user_profiles.user_id JOIN post_images ON post_images.post_id = notification.post_id WHERE notification.user_id = ? ORDER BY notification.id DESC`,
         [(req.user as UserId).userId]
-      ) as unknown as Array<multiPostItem>;
+      )) as unknown as Array<multiPostItem>;
 
-      const multiTagePosts = resultPost.reduce((acc: accumalator,item:multiPostItem ) => {
+      const multiTagePosts = resultPost.reduce(
+        (acc: accumalator, item: multiPostItem) => {
           acc[item.id] ??= {
             like_by: item.like_by,
             user_id: item.user_id,
@@ -105,18 +106,19 @@ const notificationController: NotificationController = {
 
   async getCommentReplyNotification(req, res) {
     try {
-      const getCommentReplyNotification:Array<postData> = await conn.query(
+      const getCommentReplyNotification: Array<postData> = (await conn.query(
         `SELECT * FROM post_comment WHERE id=?;`,
         [req.body.comment_id]
-      )as unknown as Array<postData>;
+      )) as unknown as Array<postData>;
 
-      const resultUserProfile:Array<postimages> = await conn.query<QueryResult>(
-        `SELECT * FROM post_images JOIN user_profiles WHERE post_id=? AND user_id=? LIMIT 1;`,
-        [
-          getCommentReplyNotification[0].post_id,
-          getCommentReplyNotification[0].comment_by,
-        ]
-      )as unknown as Array<postimages>;
+      const resultUserProfile: Array<postimages> =
+        (await conn.query<QueryResult>(
+          `SELECT * FROM post_images JOIN user_profiles WHERE post_id=? AND user_id=? LIMIT 1;`,
+          [
+            getCommentReplyNotification[0].post_id,
+            getCommentReplyNotification[0].comment_by,
+          ]
+        )) as unknown as Array<postimages>;
 
       const object = {
         post_id: getCommentReplyNotification[0].post_id,

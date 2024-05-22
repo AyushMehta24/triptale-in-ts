@@ -37,10 +37,10 @@ const passportFunc = () => {
       done: Function
     ) {
       try {
-        let [result]: Array<Array<userAuthDetails>> = await conn.query<QueryResult>(
-          `select * from users_auth where id = '${jwt_payload.userId}'`
-        ) as unknown as Array<Array<userAuthDetails>>;
-        console.log(result);
+        let [result]: Array<Array<userAuthDetails>> =
+          (await conn.query<QueryResult>(
+            `select * from users_auth where id = '${jwt_payload.userId}'`
+          )) as unknown as Array<Array<userAuthDetails>>;
         if (result.length >= 1) {
           if (result[0].status === "Active") {
             return done(null, jwt_payload);

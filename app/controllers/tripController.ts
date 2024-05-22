@@ -14,9 +14,10 @@ import {
   tripDetailsInterface,
   datesSDED,
   idList,
-  tripIdList,editMembers,
-  idDetails
-} from "../../dto/ tripControllerinterface";
+  tripIdList,
+  editMembers,
+  idDetails,
+} from "../../dto/tripControllerinterface";
 import { UnknownFieldMessageFactory } from "express-validator";
 import { Socket } from "socket.io";
 
@@ -560,16 +561,22 @@ const tripinsert = () => {
       }
     },
 
-    async editmembers(req:Request, res:Response) {
+    async editmembers(req: Request, res: Response) {
       try {
         const userId = (req.user as UserId).userId;
         const tripId = req.params.tid;
-       let  sql = `select profile_image , username , user_profiles.user_id , trip_members.trip_id from trip_members join user_profiles on user_profiles.user_id = trip_members.user_id where trip_id = ? and trip_members.user_id != ? and deleted_at is NULL;`;
-        const result:Array<editMembers> = await conn.query<QueryResult>(sql, [tripId, userId])as unknown as Array<editMembers>;
+        let sql = `select profile_image , username , user_profiles.user_id , trip_members.trip_id from trip_members join user_profiles on user_profiles.user_id = trip_members.user_id where trip_id = ? and trip_members.user_id != ? and deleted_at is NULL;`;
+        const result: Array<editMembers> = (await conn.query<QueryResult>(sql, [
+          tripId,
+          userId,
+        ])) as unknown as Array<editMembers>;
 
         if (result.length == 0) {
           sql = `select trip_members.user_id , trip_members.trip_id from trip_members join user_profiles on user_profiles.user_id = trip_members.user_id where trip_id = ? and deleted_at is NULL  and trip_members.user_id = ?`;
-          const result1:Array<idDetails> = await conn.query(sql, [tripId, userId])as unknown as Array<idDetails>;
+          const result1: Array<idDetails> = (await conn.query(sql, [
+            tripId,
+            userId,
+          ])) as unknown as Array<idDetails>;
           if (result1.length == 1) {
             res.render("components/create/trips/addmember", {
               data: result1,
@@ -591,7 +598,7 @@ const tripinsert = () => {
       }
     },
 
-    async editMembersPost(req:Request, res:Response) {
+    async editMembersPost(req: Request, res: Response) {
       try {
         const { deleterId, deletedId, tripId } = req.body;
         const sql = `update trip_members set deleted_at = current_timestamp() , deleted_by = ? where user_id = ? and trip_id = ?;`;
@@ -601,11 +608,13 @@ const tripinsert = () => {
       }
     },
 
-    async addMembersPost(req:Request, res:Response) {
+    async addMembersPost(req: Request, res: Response) {
       try {
         const { userName, tripId } = req.body;
         let sql = `select user_id from user_profiles where username = ? `;
-        const result:Array<userlist> = await conn.query(sql, [userName]) as unknown as Array<userlist>;
+        const result: Array<userlist> = (await conn.query(sql, [
+          userName,
+        ])) as unknown as Array<userlist>;
         let data = { trip_id: tripId, user_id: result[0].user_id };
         sql = `insert into trip_members SET ? `;
         const [result1] = await conn.query(sql, data);
@@ -621,14 +630,15 @@ const tripinsert = () => {
           objectNotificationTrip
         );
 
-        let trip_details:Array<tripDetailsInterface> = await conn.query(
+        let trip_details: Array<tripDetailsInterface> = (await conn.query(
           `SELECT * FROM trip_details where trip_id=?`,
           tripId
-        )as unknown as Array<tripDetailsInterface>;
-        let userDetail:Array<useProfileDetail> = await conn.query<QueryResult>(
-          `SELECT * FROM user_profiles where user_id=1;`,
-          (req.user as UserId).userId
-        )as unknown as Array<useProfileDetail>;
+        )) as unknown as Array<tripDetailsInterface>;
+        let userDetail: Array<useProfileDetail> =
+          (await conn.query<QueryResult>(
+            `SELECT * FROM user_profiles where user_id=1;`,
+            (req.user as UserId).userId
+          )) as unknown as Array<useProfileDetail>;
 
         res.json({
           id: result[0].user_id,
@@ -644,7 +654,7 @@ const tripinsert = () => {
         logger.error("tripConroller addMembersPost: " + error);
       }
     },
-    async deleteTripEvent(req:Request, res:Response) {
+    async deleteTripEvent(req: Request, res: Response) {
       try {
         let [result] = await conn.query<ResultSetHeader>(
           "update trip_events set deleted_at = CURRENT_TIMESTAMP where id = ?",
