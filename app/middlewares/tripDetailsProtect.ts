@@ -47,4 +47,4 @@ const tripDetailsProtect = async (
   }
 };
 
-module.exports = tripDetailsProtect;
+export default tripDetailsProtect;

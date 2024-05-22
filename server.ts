@@ -9,7 +9,9 @@ import passport from "passport";
 dotenv.config();
 
 const app: Application = express();
-const server = app.listen(process.env.PORT || 3002);
+const server = app.listen(process.env.PORT || 3002 , ()=>{
+  console.log(`sercver is running on port ${process.env.PORT || 3002}`);
+});
 const io: Server = new Server(server);
 
 app.set("socketio", io);

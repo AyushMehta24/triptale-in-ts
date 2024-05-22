@@ -7,7 +7,7 @@ import {
   getHomeInterface,
   getHomeInterfaceAcc,
   LikeCountInterface,
-  getProfile,
+  getProfileInterface,
 } from "../../../dto/homeControllerInterfaace";
 
 interface HomePost {
@@ -22,10 +22,11 @@ interface HomePost {
   comment_count: number;
   isdeleted: string | null;
   caption: string;
-  create_at: Date;
+  create_at: string | number;
   isvideo: number;
   flag: number;
   save_posts: number | null;
+  privacy: string;
 }
 
 interface Profile {
@@ -37,12 +38,10 @@ interface LikeCount {
   like_count: number;
 }
 
-const homeController = () => {
-  return {
-    async getHome(req: Request): Promise<HomePost[] | void> {
-      const userId = (req.user as UserId).userId;
-      try {
-        const getHomePostQuery = `
+export const getHome = async (req: Request) => {
+  const userId = (req.user as UserId).userId;
+  try {
+    const getHomePostQuery = `
           SELECT 
             posts.id,
             user.id AS userId,
@@ -77,150 +76,97 @@ const homeController = () => {
           WHERE posts.privacy_id = 1 AND posts.isdeleted IS NULL
           ORDER BY posts.create_at DESC`;
 
-        const result: Array<getHomeInterface> =
-          (await connection.query<QueryResult>(getHomePostQuery, [
-            userId,
-            userId,
-          ])) as unknown as Array<getHomeInterface>;
+    const result: Array<HomePost> = (await connection.query<QueryResult>(
+      getHomePostQuery,
+      [userId, userId]
+    )) as unknown as Array<HomePost>;
 
-        result.forEach((date) => {
-          const offset = new Date().getTimezoneOffset();
-          date.create_at = new Date(date.create_at).getTime();
-          date.create_at -= offset * 60 * 1000;
-          date.create_at = Number(new Date(date.create_at));
-          const timeDiff = Date.now() - new Date(date.create_at).getTime();
+    result.forEach((date) => {
+      const offset = new Date().getTimezoneOffset();
+      date.create_at = new Date(date.create_at).getTime();
+      date.create_at -= offset * 60 * 1000;
+      date.create_at = Number(new Date(date.create_at));
+      const timeDiff = Date.now() - new Date(date.create_at).getTime();
 
-          const minute = Math.ceil(timeDiff / 1000 / 60);
-          const hours = Math.ceil(minute / 60);
-          const days = Math.ceil(hours / 24);
-          if (minute <= 59) {
-            date.create_at = minute + " minutes ago";
-          } else if (hours <= 24) {
-            date.create_at = hours + " hours ago";
-          } else if (days <= 5) {
-            date.create_at = days + " days ago";
-          } else {
-            date.create_at = new Date(date.create_at).toDateString();
-          }
-        });
-
-        const formattedResult = Object.values(
-          result.reduce(
-            (
-              acc: getHomeInterfaceAcc,
-              {
-                id,
-                userId,
-                username,
-                image,
-                ismultiple,
-                location,
-                profile_image,
-                privacy,
-                like_count,
-                comment_count,
-                caption,
-                create_at,
-                flag,
-                save_posts,
-                isvideo,
-              }
-            ) => {
-              acc[id] ??= {
-                id,
-                userId,
-                username,
-                image: image,
-                ismultiple,
-                location,
-                profile_image,
-                privacy,
-                like_count,
-                comment_count,
-                caption,
-                create_at: new Date(create_at),
-                flag: Number(flag) || 0,
-                save_posts:
-                  save_posts === undefined ? null : Number(save_posts),
-                isvideo: isvideo,
-              };
-
-              // acc[id].image.push(image);
-              // acc[id].isvideo.push(isvideo);
-              return acc;
-            },
-            {} as Record<number, HomePost>
-          )
-        ) as HomePost[];
-
-        return formattedResult;
-      } catch (error) {
-        logger.error("Home controller ", error);
+      const minute = Math.ceil(timeDiff / 1000 / 60);
+      const hours = Math.ceil(minute / 60);
+      const days = Math.ceil(hours / 24);
+      if (minute <= 59) {
+        date.create_at = minute + " minutes ago";
+      } else if (hours <= 24) {
+        date.create_at = hours + " hours ago";
+      } else if (days <= 5) {
+        date.create_at = days + " days ago";
+      } else {
+        date.create_at = new Date(date.create_at).toDateString();
       }
-    },
+    });
 
-    async getProfile(req: Request, res: Response): Promise<Response> {
-      try {
-        const id = (req.user as UserId).userId;
+    const formattedResult = result;
 
-        const profileImageQuery =
-          "SELECT profile_image, user_id FROM user_profiles WHERE user_id = ?;";
-        const result: Array<getProfile> = (await connection.query<QueryResult>(
-          profileImageQuery,
-          id
-        )) as unknown as Array<getProfile>;
-
-        return res.status(200).json({ profile: result });
-      } catch (error) {
-        logger.error("Home Controller getProfile function: ", error);
-        return res.status(500).json({ error: "Internal server error" });
-      }
-    },
-
-    async getLikeCount(req: Request, res: Response): Promise<Response> {
-      try {
-        const likeId = req.body.likeId;
-        let result: [LikeCount[], QueryResult];
-
-        if (req.body.flag === 1) {
-          const updateLikeCountQuery =
-            "UPDATE posts SET like_count = like_count + 1 WHERE id = ?";
-          const likedByData =
-            "INSERT INTO post_likes (post_id, liked_by) VALUES (?, ?) ON DUPLICATE KEY UPDATE isdeleted = NULL";
-
-          await connection.query(updateLikeCountQuery, [likeId]);
-          await connection.query(likedByData, [
-            likeId,
-            (req.user as UserId).userId,
-          ]);
-        } else {
-          const updateLikeCountQuery =
-            "UPDATE posts SET like_count = like_count - 1 WHERE id = ?";
-          const removeLike =
-            "UPDATE post_likes SET isdeleted = CURRENT_TIMESTAMP WHERE post_id = ? AND liked_by = ?";
-
-          await connection.query(updateLikeCountQuery, [likeId]);
-          await connection.query(removeLike, [
-            likeId,
-            (req.user as UserId).userId,
-          ]);
-        }
-
-        const getLikeCount = "SELECT like_count FROM posts WHERE id = ?";
-        const updateLikeCountQuery: Array<LikeCountInterface> =
-          (await connection.query<QueryResult>(getLikeCount, [
-            likeId,
-          ])) as unknown as Array<LikeCountInterface>;
-
-        return res
-          .status(200)
-          .json({ updateCount: updateLikeCountQuery[0].like_count });
-      } catch (error) {
-        logger.error("Home getlikeData: " + error);
-        return res.status(500).json({ error: "Internal server error" });
-      }
-    },
-  };
+    return formattedResult;
+  } catch (error) {
+    logger.error("Home controller ", error);
+  }
 };
 
-export default homeController;
+export const getProfile = async (req: Request, res: Response) => {
+  try {
+    const id = (req.user as UserId).userId;
+
+    const profileImageQuery =
+      "SELECT profile_image, user_id FROM user_profiles WHERE user_id = ?;";
+    const result: Array<getProfileInterface> =
+      (await connection.query<QueryResult>(
+        profileImageQuery,
+        id
+      )) as unknown as Array<getProfileInterface>;
+
+    return res.status(200).json({ profile: result });
+  } catch (error) {
+    logger.error("Home Controller getProfile function: ", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getLikeCount = async (req: Request, res: Response) => {
+  try {
+    const likeId = req.body.likeId;
+    let result: [LikeCount[], QueryResult];
+
+    if (req.body.flag === 1) {
+      const updateLikeCountQuery =
+        "UPDATE posts SET like_count = like_count + 1 WHERE id = ?";
+      const likedByData =
+        "INSERT INTO post_likes (post_id, liked_by) VALUES (?, ?) ON DUPLICATE KEY UPDATE isdeleted = NULL";
+
+      await connection.query(updateLikeCountQuery, [likeId]);
+      await connection.query(likedByData, [
+        likeId,
+        (req.user as UserId).userId,
+      ]);
+    } else {
+      const updateLikeCountQuery =
+        "UPDATE posts SET like_count = like_count - 1 WHERE id = ?";
+      const removeLike =
+        "UPDATE post_likes SET isdeleted = CURRENT_TIMESTAMP WHERE post_id = ? AND liked_by = ?";
+
+      await connection.query(updateLikeCountQuery, [likeId]);
+      await connection.query(removeLike, [likeId, (req.user as UserId).userId]);
+    }
+
+    const getLikeCount = "SELECT like_count FROM posts WHERE id = ?";
+    const updateLikeCountQuery: Array<LikeCountInterface> =
+      (await connection.query<QueryResult>(getLikeCount, [
+        likeId,
+      ])) as unknown as Array<LikeCountInterface>;
+
+    return res
+      .status(200)
+      .json({ updateCount: updateLikeCountQuery[0].like_count });
+  } catch (error) {
+    logger.error("Home getlikeData: " + error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+

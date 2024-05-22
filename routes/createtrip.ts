@@ -1,5 +1,4 @@
 import { Router } from "express";
-import passport from "passport";
 import multer from "multer";
 import configurePassport from "../app/config/passport";
 import tripProtect from "../app/middlewares/tripprotect";
@@ -10,11 +9,11 @@ import tripMemberProtect from "../app/middlewares/tripChatProtect";
 import tripCoverUpload from "../app/middlewares/tripcoverphoto";
 import tripImages from "../app/middlewares/tripImages";
 import tripDaysProtect from "../app/middlewares/tripDaysProtect";
-import { eventImageUpload } from "../app/middlewares/tripEventsCover";
+import  eventImageUpload  from "../app/middlewares/tripEventsCover";
 import tripDetailsProtect from "../app/middlewares/tripDetailsProtect";
 import tripEventUpdateProtect from "../app/middlewares/tripEventUpdateProtect";
 
-configurePassport(passport);
+configurePassport();
 
 const router = Router();
 

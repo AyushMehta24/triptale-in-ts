@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import logger from '../config/logger';
-import homeController from './homeControllers/homeController';
+import * as homeController from './homeControllers/homeController';
 
 interface MainController {
   getMain(req: Request, res: Response): Promise<void>;
@@ -9,7 +9,7 @@ interface MainController {
 const mainController: MainController = {
   async getMain(req, res) {
     try {
-      const showData = await homeController().getHome(req);
+      const showData = await homeController.getHome(req);
       res.render("components/home/homeMain", {
         showPosts: showData
       });
