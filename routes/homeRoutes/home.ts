@@ -1,11 +1,11 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Router } from "express";
 import mainController from "../../app/controllers/mainController";
 import * as homeController from "../../app/controllers/homeControllers/homeController";
 import * as getUserInfo from "../../app/controllers/homeControllers/likeCommenController";
 import * as onePostDetails from "../../app/controllers/homeControllers/postDetailsController";
 import * as replyController from "../../app/controllers/homeControllers/replyCommentController";
 
-const home = express.Router();
+const home:Router = express.Router();
 
 home.get("/", (req: Request, res: Response) => {
   mainController.getMain(req, res);

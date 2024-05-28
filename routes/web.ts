@@ -19,7 +19,7 @@ import {
 import home from "./homeRoutes/home";
 import app from "./displayTrip";
 
-const web = Router();
+const web:Router = Router();
 
 web.get(
   "/",

@@ -1,16 +1,16 @@
-import multer, { MulterError } from "multer";
+import multer, { Multer, MulterError, StorageEngine } from "multer";
 import fs from "fs";
 import path from "path";
 import { Request, Response, NextFunction } from "express";
 import conn from "../config/mysql_connection";
 import { UserId } from "../../index";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const coverfolder = (req.user as UserId).userId;
-    const tripid = req.body.tid;
-    const userId = coverfolder.toString();
-    const uploadDir = path.join("images", "trips", "tripImages", tripid);
+const storage:StorageEngine = multer.diskStorage({
+  destination: (req:Request, file, cb) => {
+    const coverfolder:string = (req.user as UserId).userId;
+    const tripid:string = req.body.tid;
+    const userId:string = coverfolder.toString();
+    const uploadDir:string = path.join("images", "trips", "tripImages", tripid);
 
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -18,12 +18,12 @@ const storage = multer.diskStorage({
 
     cb(null, uploadDir);
   },
-  filename: (req, file, cb) => {
+  filename: (req:Request, file, cb) => {
     cb(null, Date.now() + "--" + file.originalname);
   },
 });
 
-const upload = multer({ storage: storage });
+const upload:Multer = multer({ storage: storage });
 
 const tripImages = (req: Request, res: Response, next: NextFunction) => {
   upload.array("tripmultiimage", 20)(req, res, (err: any) => {
@@ -37,14 +37,14 @@ const tripImages = (req: Request, res: Response, next: NextFunction) => {
     const errors: string[] = [];
 
     files.forEach((file) => {
-      const allowedTypes = [
+      const allowedTypes:string[] = [
         "image/jpeg",
         "image/png",
         "image/jpg",
         "video/mp4",
         "video/webm",
       ];
-      const maxSize = 50 * 1024 * 1024; // 50MB
+      const maxSize:number = 50 * 1024 * 1024; // 50MB
 
       if (!allowedTypes.includes(file.mimetype)) {
         errors.push(`Invalid file type: ${file.filename}`);

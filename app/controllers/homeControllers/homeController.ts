@@ -1,5 +1,10 @@
 import { Request, Response, query } from "express";
-import { QueryResult, ResultSetHeader } from "mysql2";
+import {
+  FieldPacket,
+  QueryResult,
+  ResultSetHeader,
+  RowDataPacket,
+} from "mysql2";
 import logger from "../../config/logger";
 import connection from "../../config/mysql_connection";
 import { UserId } from "../../../index";
@@ -9,6 +14,7 @@ import {
   LikeCountInterface,
   getProfileInterface,
 } from "../../../dto/homeControllerInterfaace";
+import { UpdateSet, dataSet } from "../../../dto/commonInterface";
 
 interface HomePost {
   id: number;
@@ -29,17 +35,21 @@ interface HomePost {
   privacy: string;
 }
 
-interface Profile {
-  profile_image: string;
-  user_id: number;
-}
+// type dataSet =[QueryResult, FieldPacket[]]
+
+// interface Profile {
+//   profile_image: string;
+//   user_id: number;
+// }
 
 interface LikeCount {
   like_count: number;
 }
 
-export const getHome = async (req: Request) => {
-  const userId = (req.user as UserId).userId;
+export const getHome: (
+  req: Request
+) => Promise<RowDataPacket[] | undefined> = async (req: Request) => {
+  const userId: string = (req.user as UserId).userId;
   try {
     const getHomePostQuery = `
           SELECT 
@@ -76,21 +86,21 @@ export const getHome = async (req: Request) => {
           WHERE posts.privacy_id = 1 AND posts.isdeleted IS NULL
           ORDER BY posts.create_at DESC`;
 
-    const result: Array<HomePost> = (await connection.query<QueryResult>(
+    const result: RowDataPacket[] = (await connection.query<QueryResult>(
       getHomePostQuery,
       [userId, userId]
-    )) as unknown as Array<HomePost>;
+    )) as RowDataPacket[];
 
-    result.forEach((date) => {
-      const offset = new Date().getTimezoneOffset();
+    result.forEach((date: RowDataPacket): void => {
+      const offset: number = new Date().getTimezoneOffset();
       date.create_at = new Date(date.create_at).getTime();
       date.create_at -= offset * 60 * 1000;
       date.create_at = Number(new Date(date.create_at));
-      const timeDiff = Date.now() - new Date(date.create_at).getTime();
+      const timeDiff: number = Date.now() - new Date(date.create_at).getTime();
 
-      const minute = Math.ceil(timeDiff / 1000 / 60);
-      const hours = Math.ceil(minute / 60);
-      const days = Math.ceil(hours / 24);
+      const minute: number = Math.ceil(timeDiff / 1000 / 60);
+      const hours: number = Math.ceil(minute / 60);
+      const days: number = Math.ceil(hours / 24);
       if (minute <= 59) {
         date.create_at = minute + " minutes ago";
       } else if (hours <= 24) {
@@ -102,9 +112,7 @@ export const getHome = async (req: Request) => {
       }
     });
 
-    const formattedResult = result;
-
-    return formattedResult;
+    return result;
   } catch (error) {
     logger.error("Home controller ", error);
   }
@@ -112,17 +120,21 @@ export const getHome = async (req: Request) => {
 
 export const getProfile = async (req: Request, res: Response) => {
   try {
-    const id = (req.user as UserId).userId;
+    const id: string = (req.user as UserId).userId;
 
     const profileImageQuery =
       "SELECT profile_image, user_id FROM user_profiles WHERE user_id = ?;";
-    const result: Array<getProfileInterface> =
-      (await connection.query<QueryResult>(
-        profileImageQuery,
-        id
-      )) as unknown as Array<getProfileInterface>;
+    const result: dataSet = await connection.query(profileImageQuery, id);
 
-    return res.status(200).json({ profile: result });
+    //   const profileImageQuery =
+    //   "SELECT profile_image, user_id FROM user_profiles WHERE user_id = ?;";
+    // const result: [getProfileInterface[],FieldPacket[]] =
+    //   (await connection.query<getProfileInterface[]>(
+    //     profileImageQuery,
+    //     id
+    //   )) ;
+
+    return res.status(200).json({ profile: result[0] });
   } catch (error) {
     logger.error("Home Controller getProfile function: ", error);
     return res.status(500).json({ error: "Internal server error" });
@@ -131,13 +143,13 @@ export const getProfile = async (req: Request, res: Response) => {
 
 export const getLikeCount = async (req: Request, res: Response) => {
   try {
-    const likeId = req.body.likeId;
-    let result: [LikeCount[], QueryResult];
+    const likeId: string = req.body.likeId;
+    // let result: [LikeCount[], QueryResult];
 
     if (req.body.flag === 1) {
-      const updateLikeCountQuery =
+      const updateLikeCountQuery: string =
         "UPDATE posts SET like_count = like_count + 1 WHERE id = ?";
-      const likedByData =
+      const likedByData: string =
         "INSERT INTO post_likes (post_id, liked_by) VALUES (?, ?) ON DUPLICATE KEY UPDATE isdeleted = NULL";
 
       await connection.query(updateLikeCountQuery, [likeId]);
@@ -146,27 +158,23 @@ export const getLikeCount = async (req: Request, res: Response) => {
         (req.user as UserId).userId,
       ]);
     } else {
-      const updateLikeCountQuery =
+      const updateLikeCountQuery: string =
         "UPDATE posts SET like_count = like_count - 1 WHERE id = ?";
-      const removeLike =
+      const removeLike: string =
         "UPDATE post_likes SET isdeleted = CURRENT_TIMESTAMP WHERE post_id = ? AND liked_by = ?";
 
       await connection.query(updateLikeCountQuery, [likeId]);
       await connection.query(removeLike, [likeId, (req.user as UserId).userId]);
     }
 
-    const getLikeCount = "SELECT like_count FROM posts WHERE id = ?";
-    const updateLikeCountQuery: Array<LikeCountInterface> =
-      (await connection.query<QueryResult>(getLikeCount, [
-        likeId,
-      ])) as unknown as Array<LikeCountInterface>;
+    const getLikeCount: string = "SELECT like_count FROM posts WHERE id = ?";
+    const updateLikeCountQuery: dataSet = await connection.query(getLikeCount, [
+      likeId,
+    ]);
 
-    return res
-      .status(200)
-      .json({ updateCount: updateLikeCountQuery[0].like_count });
+    return res.status(200).json({ updateCount: updateLikeCountQuery[0] }); //doubt
   } catch (error) {
     logger.error("Home getlikeData: " + error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-

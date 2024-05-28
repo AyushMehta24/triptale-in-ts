@@ -1,3 +1,5 @@
+import { RowDataPacket } from "mysql2";
+
 export interface getHomeInterface {
   id: number;
   userId: number;
@@ -40,7 +42,7 @@ export interface getHomeInterfaceAcc {
   [x: string]: getHomeInterfacePart;
 }
 
-export interface getProfileInterface {
+export interface getProfileInterface extends RowDataPacket {
   profile_image: string;
   user_id: number;
 }

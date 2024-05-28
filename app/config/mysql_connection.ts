@@ -5,7 +5,7 @@ const connection = mysql
     host: "localhost",
     user: "root",
     password: "root",
-    database: "newtriptale",
+    database: "final_triptale",
   })
   .promise();
 

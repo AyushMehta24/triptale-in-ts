@@ -1,3 +1,4 @@
+import { dataSet } from "../../dto/commonInterface";
 import { UserId } from "../../index";
 import conn from "../config/mysql_connection";
 import { Request, Response, NextFunction } from "express";
@@ -11,11 +12,13 @@ const tripprotect = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.query.tid) {
       return res.redirect("/displayTrip");
     }
-    const result: Array<countTid> = (await conn.query(
+    const result: dataSet = await conn.query(
       `select count(*) as tid from trip_details where trip_id=? AND (SELECT count(*) FROM trip_members WHERE trip_id=? and user_id=?)`,
       [req.query.tid, req.query.tid, (req.user as UserId).userId]
-    )) as unknown as Array<countTid>;
-    if (result[0].tid >= 1) {
+    );
+
+    const resultInfo: countTid[] = result[0] as countTid[];
+    if (resultInfo[0].tid >= 1) {
       next();
     } else {
       if (req.method === "POST") {

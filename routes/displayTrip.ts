@@ -6,7 +6,7 @@ import tripChatProtect from "../app/middlewares/tripChatProtect";
 import tripDetailsProtect from "../app/middlewares/tripDetailsProtect";
 import tripImagesProtect from "../app/middlewares/tripImagesProtect";
 
-const app = Router();
+const app:Router = Router();
 
 app.use(express.static(path.join(__dirname, "/displayTrips")));
 

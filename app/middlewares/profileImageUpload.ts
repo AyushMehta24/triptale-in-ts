@@ -1,12 +1,12 @@
-import multer, { MulterError } from "multer";
+import multer, { Multer, MulterError, StorageEngine } from "multer";
 import fs from "fs";
 import path from "path";
 import { Request, Express } from "express";
 import { UserId } from "../../index";
 
-const storage = multer.diskStorage({
+const storage:StorageEngine = multer.diskStorage({
   destination: (req: Request, file: Express.Multer.File, cb) => {
-    const dirPath = path.join(
+    const dirPath:string = path.join(
       __dirname,
       "..",
       "images",
@@ -21,8 +21,8 @@ const storage = multer.diskStorage({
     cb(null, dirPath);
   },
   filename: (req: Request, file: Express.Multer.File, cb) => {
-    const filetype = file.mimetype;
-    const fileformat = filetype.split("/")[1];
+    const filetype:string = file.mimetype;
+    const fileformat:string = filetype.split("/")[1];
 
     cb(null, `${Date.now()}_${(req.user as UserId).userId}.${fileformat}`);
   },
@@ -40,12 +40,12 @@ const fileFilter = (
   }
 };
 
-const profileUpload = multer({
+const profileUpload:Multer = multer({
   storage: storage,
   fileFilter: fileFilter,
 });
 
-const profileUploadUpdate = multer({
+const profileUploadUpdate:Multer = multer({
   storage: storage,
   fileFilter: (req: Request, file: Express.Multer.File, cb) => {
     if (file.mimetype === "image/png") {

@@ -4,6 +4,7 @@ import logger from "../config/logger";
 import { UserId } from "../../index";
 import { insightDetail } from "../../dto/insightControllerInterface";
 import { QueryResult } from "mysql2";
+import { dataSet } from "../../dto/commonInterface";
 
 interface InsightController {
   insightDashbord(req: Request, res: Response): Promise<void>;
@@ -16,20 +17,22 @@ interface InsightController {
 const insightController: InsightController = {
   async insightDashbord(req, res) {
     try {
-      const insightDashbord: Array<Array<insightDetail>> = (await conn.query(
+      const insightDashbord: dataSet = (await conn.query(
         `SELECT like_count,comment_count FROM posts where user_id=? and id=? and isdeleted is null;`,
         [(req.user as UserId).userId, req.params.id]
-      )) as unknown as Array<Array<insightDetail>>;
+      )) ;
 
-      if (insightDashbord[0].length !== 0) {
-        const insightPost = await conn.query<QueryResult>(
+      const insightInfo: insightDetail[] = insightDashbord[0] as insightDetail[];
+
+      if (insightInfo.length !== 0) {
+        const insightPost:dataSet = await conn.query(
           `SELECT * FROM posts join post_images on posts.id=post_images.post_id  where posts.id=? and isdeleted is null limit 1 ;`,
           [req.params.id]
         );
 
         res.render("components/insight/insightful", {
           insightPost: insightPost[0],/////////////////////////// doubt /////////////////////
-          insightDashbord: insightDashbord[0][0],
+          insightDashbord: insightInfo[0],
           type: "",
           id: req.params.id,
         });
@@ -44,7 +47,7 @@ const insightController: InsightController = {
 
   async fetchUsernameLike(req, res) {
     try {
-      const fetchUsernameLike = await conn.query(
+      const fetchUsernameLike:dataSet = await conn.query(
         `SELECT username, profile_image, concat(first_name, " ", last_name) as name FROM post_likes inner join user_profiles where post_likes.liked_by=user_profiles.user_id  and post_likes.post_id = ? and post_likes.isdeleted is null;`,
         [req.body.postId]
       );
@@ -58,7 +61,7 @@ const insightController: InsightController = {
 
   async fetchUsernameComments(req, res) {
     try {
-      const fetchUsernameComments = await conn.query(
+      const fetchUsernameComments:dataSet = await conn.query(
         `SELECT username, comments, profile_image, concat(first_name, " ", last_name) as name FROM post_comment inner join user_profiles where post_comment.comment_by=user_profiles.user_id  and post_comment.post_id =? and post_comment.deleted_at is null;`,
         [req.body.postId]
       );
@@ -79,7 +82,7 @@ const insightController: InsightController = {
         totalevents,
         totalmembers,
         totalimage,
-      ] = await Promise.all([
+      ]:[dataSet,dataSet,dataSet,dataSet,dataSet,dataSet]= await Promise.all([
         conn.query<QueryResult>(`SELECT * FROM trip_details where trip_id=?`, [
           req.params.id,
         ]),
@@ -122,7 +125,7 @@ const insightController: InsightController = {
 
   async tripMembers(req, res) {
     try {
-      const tripMembers = await conn.query(
+      const tripMembers:dataSet = await conn.query(
         `SELECT profile_image, concat(first_name, "", last_name) as name, username FROM trip_members join user_profiles on trip_members.user_id=user_profiles.user_id where trip_id=? and deleted_at is null;`,
         [req.body.postId]
       );

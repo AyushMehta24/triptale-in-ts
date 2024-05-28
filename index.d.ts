@@ -19,7 +19,7 @@ declare global {
     interface Request {
       file?: ProfileImage;
       user?: UserId;
-      files?: Array<ProfileImage>;
+      files?: ProfileImage[];
     }
   }
 }

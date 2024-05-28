@@ -1,18 +1,18 @@
-import multer, { Multer, FileFilterCallback } from "multer";
+import multer, { Multer, FileFilterCallback, StorageEngine } from "multer";
 import fs from "fs";
 import path from "path";
 import logger from "../config/logger";
 import { Request } from "express";
 
-const storage = multer.diskStorage({
+const storage:StorageEngine = multer.diskStorage({
   destination: (
     req: Request,
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
     try {
-      const tid = req.params.tid ?? req.query.tid ?? "";
-      let uploadDir = path.join(
+      const tid:string = req.params.tid ?? req.query.tid ?? "";
+      let uploadDir:string = path.join(
         "images",
         "trips",
         "tripsevents",
@@ -32,9 +32,9 @@ const storage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void
   ) => {
-    let filetype = file.mimetype;
-    let fileformate = filetype.split("/")[1];
-    const tid = req.params.tid ? req.params.tid : req.query.tid;
+    let filetype:string = file.mimetype;
+    let fileformate:string = filetype.split("/")[1];
+    const tid:string = req.params.tid ? req.params.tid : req.query.tid as string;
     cb(null, `${Date.now()}_${tid}.${fileformate}`);
   },
 });

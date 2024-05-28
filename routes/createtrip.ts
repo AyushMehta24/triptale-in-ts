@@ -15,7 +15,7 @@ import tripEventUpdateProtect from "../app/middlewares/tripEventUpdateProtect";
 
 configurePassport();
 
-const router = Router();
+const router:Router = Router();
 
 router.get("/createtrip", tripInsert().createTrip);
 router.post(

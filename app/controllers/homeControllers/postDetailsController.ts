@@ -7,30 +7,31 @@ import {
   postDetailqueryInterface,
   postDetailqueryInterfaceAcc,
 } from "../../../dto/postDetailControllerInterface";
+import { dataSet } from "../../../dto/commonInterface";
 
 export async function getDetails(req: Request, res: Response) {
   try {
-    const id = req.body.postId;
-    const postDetailsQuery =
+    const id:string = req.body.postId;
+    const postDetailsQuery:string =
       "select user.username, posts.location, posts.like_count, posts.comment_count, posts.descriptions,posts.ismultiple, post_images.image, user.profile_image, post_images.isvideo from posts inner join users_auth on posts.user_id = users_auth.id inner join user_profiles user on user.user_id = users_auth.id inner join post_images on post_images.post_id = posts.id where posts.id = ?";
 
-    const hashtagQuery =
+    const hashtagQuery :string=
       "select name from hashtags inner join post_hashtags on post_hashtags.tag = hashtags.id where post_hashtags.post_id = ?";
 
-    const tagPeopleQuery =
+    const tagPeopleQuery:string =
       "select user.username from user_profiles user inner join post_people_tags on post_people_tags.user_id = user.user_id where post_people_tags.post_id = ?";
 
-    let result: Array<postDetailqueryInterface> = (await connection.query(
+    let result: dataSet = (await connection.query(
       postDetailsQuery,
       id
-    )) as unknown as Array<postDetailqueryInterface>;
-    const [hashtagRes] = await connection.query(hashtagQuery, id);
-    const [tagPeopleRes] = await connection.query(tagPeopleQuery, id);
-    result = Object.values(result);
+    )) ;
+    const hashtagRes :dataSet= await connection.query(hashtagQuery, id);
+    const tagPeopleRes:dataSet = await connection.query(tagPeopleQuery, id);
+    result[0] = Object.values(result[0]);
     res.status(200).json({
-      postData: result,
-      hashTags: hashtagRes,
-      tagPeoples: tagPeopleRes,
+      postData: result[0],
+      hashTags: hashtagRes[0],
+      tagPeoples: tagPeopleRes[0],
     });
   } catch (error) {
     console.log(error);

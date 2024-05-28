@@ -1,7 +1,7 @@
 import { Router } from "express";
 import profileController from "../app/controllers/profileController";
 
-const router = Router();
+const router:Router = Router();
 
 router.get("/", profileController.getUserProfilePage);
 router.get("/editProfile", profileController.getEditProfilePage);

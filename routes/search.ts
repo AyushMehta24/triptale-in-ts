@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import searchController from "../app/controllers/searchcontroller";
 
-const router = Router();
+const router:Router = Router();
 
 router.get("/", (req: Request, res: Response) => {
   searchController().getpage(req, res);

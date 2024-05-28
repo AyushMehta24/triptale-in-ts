@@ -3,6 +3,7 @@ import conn from "../config/mysql_connection";
 import logger from "../config/logger";
 import { QueryResult } from "mysql2";
 import { combo } from "../../dto/combocontrollerInterface";
+import { dataSet } from "../../dto/commonInterface";
 
 interface ComboController {
   countries(req: Request, res: Response): Promise<void>;
@@ -15,7 +16,7 @@ const comboController: () => ComboController = () => {
   return {
     async countries(req: Request, res: Response) {
       try {
-        let result = await conn.query(`SELECT * FROM countries;`);
+        let result: dataSet = await conn.query(`SELECT * FROM countries;`);
         res.json({ result: result[0] });
       } catch (error) {
         logger.error("comboController countries function: ", error);
@@ -25,7 +26,7 @@ const comboController: () => ComboController = () => {
 
     async states(req: Request, res: Response) {
       try {
-        let result = await conn.query(
+        let result: dataSet = await conn.query(
           `SELECT * FROM states where country_id=?`,
           [req.body.id]
         );
@@ -39,7 +40,7 @@ const comboController: () => ComboController = () => {
 
     async cities(req: Request, res: Response) {
       try {
-        let result = await conn.query(
+        let result: dataSet = await conn.query(
           `SELECT * FROM cities WHERE state_id = ?`,
           [req.body.id]
         );
@@ -53,15 +54,16 @@ const comboController: () => ComboController = () => {
 
     async checkUsername(req: Request, res: Response) {
       try {
-        let result: Array<Array<combo>> = (await conn.query<QueryResult>(
+        let result: dataSet = (await conn.query<QueryResult>(
           `SELECT * FROM user_profiles where username=?`,
           [req.body.username]
-        )) as unknown as Array<Array<combo>>;
+        )) 
+        const userDetails = result[0] as combo[];
 
-        if (result[0].length == 0) {
+        if (userDetails.length == 0) {
           res.json({ isExists: false });
         } else {
-          res.json({ isExists: true, userId: result[0][0].user_id });
+          res.json({ isExists: true, userId: userDetails[0].user_id });
         }
       } catch (error) {
         logger.error("comboController checkUsername function: ", error);

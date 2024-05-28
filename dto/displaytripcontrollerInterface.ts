@@ -5,6 +5,7 @@ export interface tripInfo {
   title: string;
   discription: string;
   user_id: number;
+  image:string
 }
 
 export interface tripDetails {

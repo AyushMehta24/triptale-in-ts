@@ -38,6 +38,8 @@ import {
   onepostInterfaceAcc,
 } from "../../dto/profileControllerInterface";
 import { QueryResult } from "mysql2";
+import { StreamPriorityOptions } from "http2";
+import { dataSet } from "../../dto/commonInterface";
 
 const profileController: UserProfileController = {
   getUserProfilePage(req, res) {
@@ -48,9 +50,9 @@ const profileController: UserProfileController = {
   },
   async fetchAlubums(req, res) {
     try {
-      const userId = (req.user as UserId).userId;
-      const sql = `SELECT * FROM albums WHERE user_id = ?`;
-      const sql1 = `SELECT albums.id, albums.albums_name, albums.user_id, albums_post.post_id, post_images.image, posts.isdeleted, post_images.isvideo
+      const userId: string = (req.user as UserId).userId;
+      const sql: string = `SELECT * FROM albums WHERE user_id = ?`;
+      const sql1: string = `SELECT albums.id, albums.albums_name, albums.user_id, albums_post.post_id, post_images.image, posts.isdeleted, post_images.isvideo
                 FROM albums
                 LEFT JOIN albums_post ON albums.id = albums_post.album_id
                 LEFT JOIN post_images ON post_images.post_id = albums_post.post_id
@@ -58,12 +60,13 @@ const profileController: UserProfileController = {
                 WHERE albums.user_id = ?`;
 
       let [albums] = await conn.query(sql, [userId]);
-      const albumsCoverImage: Array<multiplePostItem> =
-        (await conn.query<QueryResult>(sql1, [
-          userId,
-        ])) as unknown as Array<multiplePostItem>;
+      const albumsCoverImage: dataSet = await conn.query(sql1, [userId]);
 
-      const multiplePost = albumsCoverImage.reduce(
+      // multiplePostItem
+      const albumsCoverImageInfo: multiplePostItem[] =
+        albumsCoverImage[0] as multiplePostItem[];
+
+      const multiplePost = albumsCoverImageInfo.reduce(
         (accumulator: multiplePostAcc, item: multiplePostItem) => {
           accumulator[item.id] ??= {
             id: item.id,
@@ -82,7 +85,7 @@ const profileController: UserProfileController = {
         {}
       );
 
-      res.json({ albums, albumsCoverImage: multiplePost });
+      res.json({ albums, albumsCoverImageInfo: multiplePost });
     } catch (e) {
       logger.error("profileController fetchAlubums: ", e);
       res.status(500).send(e);
@@ -90,10 +93,10 @@ const profileController: UserProfileController = {
   },
   async createAlbums(req, res) {
     try {
-      const alubamName = req.body.albumName.trim();
-      const userId = (req.user as UserId).userId;
+      const alubamName: string = req.body.albumName.trim();
+      const userId: string = (req.user as UserId).userId;
       if (alubamName.length != 0) {
-        const sql = `INSERT INTO albums (user_id, albums_name) VALUES (?, ?)`;
+        const sql: string = `INSERT INTO albums (user_id, albums_name) VALUES (?, ?)`;
         await conn.query(sql, [userId, alubamName]);
         res.status(200).end();
       } else {
@@ -106,20 +109,20 @@ const profileController: UserProfileController = {
   },
   async fetchPosts(req, res) {
     try {
-      const userId = (req.user as UserId).userId;
-      const sql = `SELECT user_profiles.user_id, user_profiles.first_name, user_profiles.last_name, user_profiles.username, user_profiles.profile_image,
+      const userId: string = (req.user as UserId).userId;
+      const sql: string = `SELECT user_profiles.user_id, user_profiles.first_name, user_profiles.last_name, user_profiles.username, user_profiles.profile_image,
                 posts.id, posts.location, posts.like_count, posts.comment_count, posts.ismultiple, posts.caption, posts.descriptions, post_images.image, post_images.isvideo
                 FROM posts
                 LEFT JOIN user_profiles ON user_profiles.user_id = posts.user_id
                 LEFT JOIN post_images ON posts.id = post_images.post_id
                 WHERE user_profiles.user_id = ? AND posts.isdeleted IS NULL
                 ORDER BY posts.create_at DESC`;
-      const posts: Array<FetchPostInterface> = (await conn.query<QueryResult>(
-        sql,
-        [userId]
-      )) as unknown as Array<FetchPostInterface>;
+      const posts: dataSet = await conn.query(sql, [userId]);
 
-      const multiplePost = posts.reduce(
+      // FetchPostInterface
+      const postsInfo: FetchPostInterface[] = posts[0] as FetchPostInterface[];
+
+      const multiplePost = postsInfo.reduce(
         (accumulator: FetchPostInterfaceAcc, item: FetchPostInterface) => {
           accumulator[item.id] ??= {
             id: item.id,
@@ -144,23 +147,23 @@ const profileController: UserProfileController = {
   },
   async fetchPopupPosts(req, res) {
     try {
-      const user = req.query.user;
-      const post = req.query.post;
+      const user: string = req.query.user as string;
+      const post: string = req.query.post as string;
 
-      const sql = `SELECT user_profiles.user_id, user_profiles.first_name, user_profiles.last_name, user_profiles.username, user_profiles.profile_image,
+      const sql: string = `SELECT user_profiles.user_id, user_profiles.first_name, user_profiles.last_name, user_profiles.username, user_profiles.profile_image,
                 posts.id, posts.location, posts.like_count, posts.comment_count, posts.ismultiple, posts.caption, posts.descriptions, post_images.image
                 FROM posts
                 LEFT JOIN user_profiles ON user_profiles.user_id = posts.user_id
                 LEFT JOIN post_images ON posts.id = post_images.post_id
                 WHERE user_profiles.user_id = ? AND posts.id = ?`;
 
-      const popupPost: Array<fetchPopupPostsInterface> =
-        (await conn.query<QueryResult>(sql, [
-          user,
-          post,
-        ])) as unknown as Array<fetchPopupPostsInterface>;
+      const popupPost: dataSet = await conn.query(sql, [user, post]);
 
-      const multiplePost = popupPost.reduce(
+      // fetchPopupPostsInterface
+      const popupPostInfo: fetchPopupPostsInterface[] =
+        popupPost[0] as fetchPopupPostsInterface[];
+
+      const multiplePost = popupPostInfo.reduce(
         (
           accumulator: fetchPopupPostsInterfaceAcc,
           item: fetchPopupPostsInterface
@@ -195,20 +198,23 @@ const profileController: UserProfileController = {
   },
   async fetchTagePost(req, res) {
     try {
-      const userId = (req.user as UserId).userId;
+      const userId: string = (req.user as UserId).userId;
 
-      const sql = `SELECT post_people_tags.user_id, post_people_tags.post_id, posts.user_id AS users, posts.location, posts.like_count, posts.isdeleted, posts.comment_count, posts.ismultiple, posts.caption, posts.descriptions, post_images.image, post_images.isvideo, user_profiles.first_name, user_profiles.last_name, user_profiles.username, user_profiles.profile_image
+      const sql: string = `SELECT post_people_tags.user_id, post_people_tags.post_id, posts.user_id AS users, posts.location, posts.like_count, posts.isdeleted, posts.comment_count, posts.ismultiple, posts.caption, posts.descriptions, post_images.image, post_images.isvideo, user_profiles.first_name, user_profiles.last_name, user_profiles.username, user_profiles.profile_image
                 FROM posts
                 LEFT JOIN post_people_tags ON post_people_tags.post_id = posts.id
                 LEFT JOIN post_images ON posts.id = post_images.post_id
                 LEFT JOIN user_profiles ON user_profiles.user_id = posts.user_id
                 WHERE post_people_tags.user_id = ? AND posts.isdeleted IS NULL`;
 
-      const posts: Array<fetchTagePostInterface> =
-        (await conn.query<QueryResult>(sql, [
-          userId,
-        ])) as unknown as Array<fetchTagePostInterface>;
-      const multiTagePosts = posts.reduce(
+      const posts: dataSet = await conn.query(sql, [userId]);
+
+      // fetchTagePostInterface
+
+      const postsInfo: fetchTagePostInterface[] =
+        posts[0] as fetchTagePostInterface[];
+
+      const multiTagePosts = postsInfo.reduce(
         (
           accumulator: fetchTagePostInterfaceAcc,
           item: fetchTagePostInterface
@@ -236,20 +242,24 @@ const profileController: UserProfileController = {
   },
   async fetchOneAlbumsPost(req, res) {
     try {
-      const sql = `SELECT albums.id, albums.user_id, albums.albums_name, albums_post.post_id, post_images.image, post_images.isvideo, posts.isdeleted
+      const sql: string = `SELECT albums.id, albums.user_id, albums.albums_name, albums_post.post_id, post_images.image, post_images.isvideo, posts.isdeleted
                 FROM albums
                 LEFT JOIN albums_post ON albums_post.album_id = albums.id
                 LEFT JOIN post_images ON post_images.post_id = albums_post.post_id
                 LEFT JOIN posts ON posts.id = post_images.post_id
                 WHERE albums.user_id = ? AND albums.id = ? AND albums.albums_name = ? AND posts.isdeleted IS NULL AND post_images.image IS NOT NULL`;
 
-      const posts: Array<fetchOneAlbumsPostInterface> = (await conn.query(sql, [
+      const posts: dataSet = await conn.query(sql, [
         req.query.user_id,
         req.query.album_id,
         req.query.album_name,
-      ])) as unknown as Array<fetchOneAlbumsPostInterface>;
+      ]);
 
-      const oneAlbumPost = posts.reduce(
+      // fetchOneAlbumsPostInterface
+      const postsInfo: fetchOneAlbumsPostInterface[] =
+        posts[0] as fetchOneAlbumsPostInterface[];
+
+      const oneAlbumPost = postsInfo.reduce(
         (
           accumulator: fetchOneAlbumsPostInterfaceAcc,
           item: fetchOneAlbumsPostInterface
@@ -278,20 +288,20 @@ const profileController: UserProfileController = {
   },
   async deletePostIdFromalbum(req, res) {
     try {
-      const postIds = req.body.ids;
-      const albumids = req.body.albumsId;
-      const userId = (req.user as UserId).userId;
+      const postIds: string = req.body.ids;
+      const albumids: string = req.body.albumsId;
+      const userId: string = (req.user as UserId).userId;
       let deletePost;
 
-      for (let i = 0; i < postIds.length; i++) {
-        let sql = `DELETE FROM albums_post WHERE album_id = ? AND post_id = ?`;
+      for (let i: number = 0; i < postIds.length; i++) {
+        let sql: string = `DELETE FROM albums_post WHERE album_id = ? AND post_id = ?`;
         deletePost = await conn.query(sql, [albumids, postIds[i]]);
       }
 
-      const albumName = `SELECT albums_name FROM albums WHERE id = ?`;
-      const [name] = await conn.query(albumName, [albumids]);
+      const albumName: string = `SELECT albums_name FROM albums WHERE id = ?`;
+      const name: dataSet = await conn.query(albumName, [albumids]);
 
-      res.json({ userId, albums_name: name }).status(200);
+      res.json({ userId, albums_name: name[0] }).status(200);
     } catch (e) {
       logger.error("profileController deletePostIdFromalbum: ", e);
       res.status(500).send(e);
@@ -299,21 +309,24 @@ const profileController: UserProfileController = {
   },
   async otherPostShowInAlbums(req, res) {
     try {
-      const userId = (req.user as UserId).userId;
-      const albumId = req.body.albumId;
+      const userId: string = (req.user as UserId).userId;
+      const albumId: string = req.body.albumId;
 
-      const sql = `SELECT posts.user_id, post_images.post_id, post_images.isvideo, post_images.image, post_images.id AS singleImageId
+      const sql: string = `SELECT posts.user_id, post_images.post_id, post_images.isvideo, post_images.image, post_images.id AS singleImageId
                 FROM posts
                 LEFT JOIN post_images ON post_images.post_id = posts.id
                 WHERE posts.user_id = ? AND posts.isdeleted IS NULL AND posts.id NOT IN (SELECT post_id FROM albums_post WHERE album_id = ?)`;
 
-      const otherPostInAlbums: Array<otherPostShowInAlbumsInterface> =
-        (await conn.query<QueryResult>(sql, [
-          userId,
-          albumId,
-        ])) as unknown as Array<otherPostShowInAlbumsInterface>;
+      const otherPostInAlbums: dataSet = await conn.query(sql, [
+        userId,
+        albumId,
+      ]);
+      const otherPostInAlbumsInfo: otherPostShowInAlbumsInterface[] =
+        otherPostInAlbums[0] as otherPostShowInAlbumsInterface[];
 
-      const multiTagePosts = otherPostInAlbums.reduce(
+      // otherPostShowInAlbumsInterface
+
+      const multiTagePosts = otherPostInAlbumsInfo.reduce(
         (
           accumulator: otherPostShowInAlbumsInterfaceAcc,
           item: otherPostShowInAlbumsInterface
@@ -342,12 +355,12 @@ const profileController: UserProfileController = {
   },
   async addPostInAlbums(req, res) {
     try {
-      const albumId = Number(req.body.albumsId);
-      const postId = req.body.ids;
-      const userId = (req.user as UserId).userId;
+      const albumId: number = Number(req.body.albumsId);
+      const postId: string = req.body.ids;
+      const userId: string = (req.user as UserId).userId;
 
-      for (let i = 0; i < postId.length; i++) {
-        let sql = `INSERT INTO albums_post (album_id, post_id) VALUES (?, ?)`;
+      for (let i: number = 0; i < postId.length; i++) {
+        let sql:string = `INSERT INTO albums_post (album_id, post_id) VALUES (?, ?)`;
         await conn.query(sql, [albumId, postId[i]]);
       }
 
@@ -359,18 +372,18 @@ const profileController: UserProfileController = {
   },
   async fetchDetails(req, res) {
     try {
-      const userId = (req.user as UserId).userId;
-      const sql1 = `SELECT COUNT(user_id) AS postcount FROM posts WHERE user_id = ? AND posts.is            deleted IS NULL`;
-      const sql2 = `SELECT COUNT(user_id) AS followcount FROM user_follows WHERE follow_id = ?`;
-      const sql3 = `SELECT COUNT(user_id) AS followercount FROM user_follows WHERE user_id = ?`;
-      const sql4 = `SELECT COUNT(user_id) AS followingcount FROM user_follows WHERE follow_id = ?`;
-      const sql5 = `SELECT COUNT(albums.id) AS albumcount FROM albums WHERE user_id = ?`;
+      const userId:string = (req.user as UserId).userId;
+      const sql1:string = `SELECT COUNT(user_id) AS postcount FROM posts WHERE user_id = ? AND posts.is            deleted IS NULL`;
+      const sql2:string = `SELECT COUNT(user_id) AS followcount FROM user_follows WHERE follow_id = ?`;
+      const sql3:string = `SELECT COUNT(user_id) AS followercount FROM user_follows WHERE user_id = ?`;
+      const sql4:string = `SELECT COUNT(user_id) AS followingcount FROM user_follows WHERE follow_id = ?`;
+      const sql5:string = `SELECT COUNT(albums.id) AS albumcount FROM albums WHERE user_id = ?`;
 
-      const [postcount] = await conn.query(sql1, [userId]);
-      const [followcount] = await conn.query(sql2, [userId]);
-      const [followercount] = await conn.query(sql3, [userId]);
-      const [followingcount] = await conn.query(sql4, [userId]);
-      const [albumcount] = await conn.query(sql5, [userId]);
+      const postcount:dataSet = await conn.query(sql1, [userId]);
+      const followcount:dataSet = await conn.query(sql2, [userId]);
+      const followercount:dataSet = await conn.query(sql3, [userId]);
+      const followingcount:dataSet = await conn.query(sql4, [userId]);
+      const albumcount:dataSet = await conn.query(sql5, [userId]);
 
       res.status(200).json({
         postcount,
@@ -386,12 +399,12 @@ const profileController: UserProfileController = {
   },
   async deleteAlbum(req, res) {
     try {
-      const albumId = req.body.albumId;
+      const albumId:string = req.body.albumId;
 
-      const sql = `DELETE FROM albums WHERE id = ?`;
-      const sql1 = `DELETE FROM albums_post WHERE album_id = ?`;
-      const deleteAlbum = await conn.query(sql, [albumId]);
-      const deleteAlbumPost = await conn.query(sql1, [albumId]);
+      const sql:string = `DELETE FROM albums WHERE id = ?`;
+      const sql1 :string= `DELETE FROM albums_post WHERE album_id = ?`;
+       await conn.query(sql, [albumId]);
+       await conn.query(sql1, [albumId]);
 
       res.status(200).end();
     } catch (e) {
@@ -401,11 +414,11 @@ const profileController: UserProfileController = {
   },
   async updateAlbumName(req, res) {
     try {
-      const albumName = req.body.albumName;
-      const albumId = req.body.albumId;
-      const userId = (req.user as UserId).userId;
+      const albumName:string = req.body.albumName;
+      const albumId:string = req.body.albumId;
+      const userId:string = (req.user as UserId).userId;
 
-      const sql = `UPDATE albums SET albums_name = ? WHERE id = ? AND user_id = ?`;
+      const sql:string = `UPDATE albums SET albums_name = ? WHERE id = ? AND user_id = ?`;
       await conn.query(sql, [albumName, albumId, userId]);
 
       res.status(200).end();
@@ -416,11 +429,11 @@ const profileController: UserProfileController = {
   },
   async deletePostInAlbumFromHome(req, res) {
     try {
-      const postId = req.body.postId;
-      const albumId = req.body.albumId;
+      const postId:string = req.body.postId;
+      const albumId:string = req.body.albumId;
 
-      const sql = `DELETE FROM albums_post WHERE album_id = ? AND post_id = ?`;
-      const deletePostInAlbum = await conn.query(sql, [albumId, postId]);
+      const sql:string = `DELETE FROM albums_post WHERE album_id = ? AND post_id = ?`;
+      await conn.query(sql, [albumId, postId]);
 
       res.status(200).end();
     } catch (e) {
@@ -430,19 +443,22 @@ const profileController: UserProfileController = {
   },
   async onepost(req, res) {
     try {
-      const userId = (req.user as UserId).userId;
-      const postId = req.query.postId;
-      const sql = `SELECT posts.id, posts.user_id, posts.location, posts.like_count, posts.ismultiple, posts.caption, posts.descriptions, post_images.image, post_images.isvideo
+      const userId:string = (req.user as UserId).userId;
+      const postId:string = req.query.postId as string;
+      const sql:string = `SELECT posts.id, posts.user_id, posts.location, posts.like_count, posts.ismultiple, posts.caption, posts.descriptions, post_images.image, post_images.isvideo
                 FROM posts
                 LEFT JOIN post_images ON post_images.post_id = posts.id
                 WHERE posts.user_id = ? AND posts.id = ? AND posts.isdeleted IS NULL`;
 
-      const onePost: Array<onepostInterface> = (await conn.query(sql, [
+      const onePost: dataSet= (await conn.query(sql, [
         userId,
         postId,
-      ])) as unknown as Array<onepostInterface>;
+      ])) ;
 
-      const singlePost = onePost.reduce(
+      const onePostInfo: onepostInterface[] =
+      onePost[0] as onepostInterface[];
+
+      const singlePost = onePostInfo.reduce(
         (accumulator: onepostInterfaceAcc, item: onepostInterface) => {
           accumulator[item.id] ??= {
             id: item.id,

@@ -4,6 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import passport from "passport";
 import conn from "../config/mysql_connection";
 import { QueryResult } from "mysql2";
+import { dataSet } from "../../dto/commonInterface";
 // import { Strategy as Jwt } from "passport";
 
 interface userAuthDetails {
@@ -37,12 +38,16 @@ const passportFunc = () => {
       done: Function
     ) {
       try {
-        let [result]: Array<Array<userAuthDetails>> =
-          (await conn.query<QueryResult>(
-            `select * from users_auth where id = '${jwt_payload.userId}'`
-          )) as unknown as Array<Array<userAuthDetails>>;
-        if (result.length >= 1) {
-          if (result[0].status === "Active") {
+        let result:dataSet = await conn.query<QueryResult>(
+          `select * from users_auth where id = '${jwt_payload.userId}'`
+        ) ;
+
+        const postDetails: userAuthDetails[] =
+        result[0] as userAuthDetails[];
+
+        // userAuthDetails
+        if (postDetails.length >= 1) {
+          if (postDetails[0].status === "Active") {
             return done(null, jwt_payload);
           } else {
             return done(null, false);

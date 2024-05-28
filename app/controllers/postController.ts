@@ -17,18 +17,23 @@ import {
   UserProfileList,
 } from "../../dto/postControllerInterface";
 import { QueryResult, ResultSetHeader } from "mysql2";
+import { UpdateSet, dataSet, insertSet } from "../../dto/commonInterface";
+import { Strategy } from "passport";
 
 const postController = () => {
   return {
     async getUsersUserName(req: Request, res: Response) {
       try {
-        let userNames: Array<string> = [];
-        let profileImages: Array<string> = [];
-        let result: Array<getUsersUserNameInterface> = (await conn.query(
+        let userNames: string[] = [];
+        let profileImages: string[] = [];
+        let result: dataSet = await conn.query(
           `select userName,profile_image from user_profiles where userName like ?  and NOT user_id = ?`,
           [`${req.body.userLike}%`, (req.user as UserId).userId]
-        )) as unknown as Array<getUsersUserNameInterface>;
-        result.forEach((item: getUsersUserNameInterface): void => {
+        );
+        const postImagesDetails: getUsersUserNameInterface[] =
+          result[0] as getUsersUserNameInterface[];
+
+        postImagesDetails.forEach((item: getUsersUserNameInterface): void => {
           userNames.push(item.userName);
           profileImages.push(item.profile_image);
         });
@@ -40,13 +45,16 @@ const postController = () => {
     },
     async getHashTags(req: Request, res: Response) {
       try {
-        let hashtagNames: Array<string> = [];
-        let result: Array<getHashTagInterface> = (await conn.query<QueryResult>(
+        let hashtagNames: string[] = [];
+        let result: dataSet = await conn.query(
           `select name from hashtags where name like ?`,
           [`#${req.body.hashtagLike}%`]
-        )) as unknown as Array<getHashTagInterface>;
+        );
 
-        result.forEach((item: getHashTagInterface): void => {
+        const hashtagDetails: getHashTagInterface[] =
+          result[0] as getHashTagInterface[];
+
+        hashtagDetails.forEach((item: getHashTagInterface): void => {
           hashtagNames.push(item.name);
         });
         return res.json(hashtagNames);
@@ -81,14 +89,14 @@ const postController = () => {
         ) {
           postDetail["descriptions"] = req.body.description.trim();
         }
-        let result = await conn.query<ResultSetHeader>(
+        let result: insertSet = await conn.query<ResultSetHeader>(
           "INSERT INTO posts SET ?",
           postDetail
         );
-        const postId = result[0].insertId;
+        const postId: number = result[0].insertId;
 
         //post image insert
-        const extention: Array<string> = ["webm", "mp4"];
+        const extention: string[] = ["webm", "mp4"];
         try {
           req.files.forEach(async (item: ProfileImage) => {
             let image: insertPostImage = {
@@ -108,21 +116,24 @@ const postController = () => {
         if (req.body.hashtags) {
           req.body.hashtags.forEach(async (item: string) => {
             try {
-              let hashtagId: Array<idForuser> = (await conn.query<QueryResult>(
+              let hashtagId: dataSet = await conn.query(
                 `SELECT id FROM hashtags WHERE name = ?`,
                 [item]
-              )) as unknown as Array<idForuser>;
-              if (hashtagId.length == 1) {
+              );
+
+              const hashtagIdDetails: idForuser[] = hashtagId[0] as idForuser[];
+
+              if (hashtagIdDetails.length == 1) {
                 let result = await conn.query(
                   `INSERT INTO post_hashtags (post_id, tag)
                 VALUES (?,?) ON DUPLICATE KEY UPDATE isdeleted = null`,
-                  [postId, hashtagId[0].id]
+                  [postId, hashtagIdDetails[0].id]
                 );
               } else {
                 let newHashtag: { name: string } = {
                   name: item,
                 };
-                let result = await conn.query<ResultSetHeader>(
+                let result: insertSet = await conn.query<ResultSetHeader>(
                   "INSERT INTO hashtags SET ?",
                   newHashtag
                 );
@@ -142,14 +153,18 @@ const postController = () => {
         if (req.body.peopleTag) {
           req.body.peopleTag.forEach(async (item: string) => {
             try {
-              let userId: Array<useridForuser> = (await conn.query<QueryResult>(
+              let userId: dataSet = await conn.query<QueryResult>(
                 `SELECT user_id FROM user_profiles  WHERE userName = ?`,
                 [item]
-              )) as unknown as Array<useridForuser>;
-              if (userId.length == 1) {
+              );
+
+              const userIdDetails: useridForuser[] =
+                userId[0] as useridForuser[];
+
+              if (userIdDetails.length == 1) {
                 let result = await conn.query(
                   `INSERT INTO post_people_tags (post_id,user_id) VALUES (?,?) ON DUPLICATE KEY UPDATE isdeleted = null`,
-                  [postId, userId[0].user_id]
+                  [postId, userIdDetails[0].user_id]
                 );
               }
             } catch (error) {
@@ -167,16 +182,20 @@ const postController = () => {
     },
     async deletePost(req: Request, res: Response) {
       try {
-        const postId = req.body.postId;
+        const postId: string = req.body.postId;
         if (!/^\d+$/.test(postId)) {
           return res.status(500).json({ error: true });
         }
-        let result: Array<deletePost> = (await conn.query(
+        let result: dataSet = await conn.query(
           `SELECT EXISTS(SELECT * FROM posts WHERE id = ? and user_id = ?) as isexists`,
           [postId, (req.user as UserId).userId]
-        )) as unknown as Array<deletePost>;
-        if (result[0].isexists) {
-          const result1 = await conn.query<ResultSetHeader>(
+        );
+
+        const existDetails: deletePost[] = result[0] as deletePost[];
+
+        // deletePost
+        if (existDetails[0].isexists) {
+          const result1: UpdateSet = await conn.query<ResultSetHeader>(
             `update posts set isdeleted = CURRENT_TIMESTAMP where id = ?`,
             [postId]
           );
@@ -193,25 +212,25 @@ const postController = () => {
     },
     async updatePostForm(req: Request, res: Response) {
       try {
-        let postDetail: Array<updatePostForm> = (await conn.query<QueryResult>(
+        let postDetail: dataSet = await conn.query(
           "select location,caption,descriptions,privacy_id from posts where id = ?",
           [req.query.id]
-        )) as unknown as Array<updatePostForm>;
-        let hashtags = await conn.query(
+        );
+        let hashtags: dataSet = await conn.query(
           `select name from hashtags where id in(select tag from post_hashtags where post_id = ? and isdeleted is null)`,
           [req.query.id]
         );
-        let peopleTags = await conn.query(
+        let peopleTags: dataSet = await conn.query(
           `select username from user_profiles where id in(select user_id from post_people_tags where post_id = ? and isdeleted is null);`,
           [req.query.id]
         );
 
-        let postImages = await conn.query(
+        let postImages: dataSet = await conn.query(
           "select image,isvideo from post_images where post_id = ?",
           [req.query.id]
         );
 
-        const [privacy] = await conn.query("select * from privacy");
+        const privacy: dataSet = await conn.query("select * from privacy");
 
         return res.render("components/create/posts/updatePost", {
           postDetail: postDetail[0],
@@ -219,7 +238,7 @@ const postController = () => {
           peopleTags: peopleTags[0],
           postId: req.query.id,
           postImages: postImages[0],
-          privacy: privacy,
+          privacy: privacy[0],
         });
       } catch (error) {
         logger.error("Post Controller updatePostForm: " + error);
@@ -245,7 +264,7 @@ const postController = () => {
         ) {
           postDetail["descriptions"] = req.body.description.trim();
         }
-        let result = await conn.query(
+        let result: UpdateSet = await conn.query(
           `UPDATE  posts SET ? where id = ${req.query.id}`,
           postDetail
         );
@@ -256,21 +275,25 @@ const postController = () => {
         );
         if (req.body.hashtags) {
           req.body.hashtags.forEach(async (item: string) => {
-            let hashtagId: Array<HashTagName> = (await conn.query<QueryResult>(
+            let hashtagId: dataSet = await conn.query(
               `SELECT id FROM hashtags WHERE name = ?`,
               [item]
-            )) as unknown as Array<HashTagName>;
-            if (hashtagId.length == 1) {
+            );
+
+            const hashtagDetails: HashTagName[] = hashtagId[0] as HashTagName[];
+
+            // HashTagName
+            if (hashtagDetails.length == 1) {
               result = await conn.query(
                 `INSERT INTO post_hashtags (post_id, tag)
                 VALUES (?,?) ON DUPLICATE KEY UPDATE isdeleted = null`,
-                [req.query.id, hashtagId[0].id]
+                [req.query.id, hashtagDetails[0].id]
               );
             } else {
-              let newHashtag = {
+              let newHashtag: { name: string } = {
                 name: item,
               };
-              let result = await conn.query<ResultSetHeader>(
+              let result: insertSet = await conn.query<ResultSetHeader>(
                 "INSERT INTO hashtags SET ?",
                 newHashtag
               );
@@ -293,14 +316,18 @@ const postController = () => {
         );
         if (req.body.peopleTag) {
           req.body.peopleTag.forEach(async (item: string) => {
-            let userId: Array<UserProfileList> = (await conn.query<QueryResult>(
+            let userId:dataSet = (await conn.query(
               `SELECT user_id FROM user_profiles  WHERE userName = ?`,
               [item]
-            )) as unknown as Array<UserProfileList>;
-            if (userId.length == 1) {
+            )) ;
+
+            const useridDetails: UserProfileList[] = userId[0] as UserProfileList[];
+
+            // UserProfileList
+            if (useridDetails.length == 1) {
               let result = await conn.query(
                 `INSERT INTO post_people_tags (post_id,user_id) VALUES (?,?) ON DUPLICATE KEY UPDATE isdeleted = null`,
-                [req.query.id, userId[0].user_id]
+                [req.query.id, useridDetails[0].user_id]
               );
             }
           });
@@ -316,8 +343,8 @@ const postController = () => {
     async getPostInsertForm(req: Request, res: Response) {
       try {
         const privacyQuery = "select * from privacy";
-        const [result] = await conn.query(privacyQuery);
-        res.render("components/create/posts/createPost", { privacy: result });
+        const result:dataSet = await conn.query(privacyQuery);
+        res.render("components/create/posts/createPost", { privacy: result[0] });
       } catch (error) {
         logger.error("post controller get post Insert form: " + error);
       }

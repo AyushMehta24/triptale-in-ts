@@ -12,9 +12,9 @@ import {
   manyPosts,
 } from "../../dto/searchControllerInterface";
 import { QueryResult } from "mysql2";
-import { UnknownFieldInstance } from "express-validator/src/base";
 // import { QueryError } from "sequelize";
 import { accumalator } from "../../dto/notificationControllerInterface";
+import { dataSet } from "../../dto/commonInterface";
 interface Post {
   id?: number;
   user_id?: number;
@@ -91,7 +91,7 @@ const searchcontroller = () => {
   return {
     async getpage(req: Request, res: Response) {
       try {
-        const result = await connection.query(`SELECT p.id, p.user_id,
+        const result: dataSet = await connection.query(`SELECT p.id, p.user_id,
           (SELECT pi.image FROM post_images pi WHERE pi.post_id = p.id ORDER BY pi.id LIMIT 1) 
           AS image, (SELECT isvideo FROM post_images pi WHERE pi.post_id = p.id LIMIT 1) AS isvideo
           FROM posts p
@@ -106,12 +106,15 @@ const searchcontroller = () => {
     async getUsersUserName(req: Request, res: Response) {
       try {
         const usernames: string[] = [];
-        const result: Array<uniqueUsername> =
-          (await connection.query<QueryResult>(
-            `SELECT DISTINCT(username) FROM user_profiles WHERE username LIKE CONCAT(?, "%")`,
-            [req.body.userLike]
-          )) as unknown as Array<uniqueUsername>;
-        result.forEach((item: SearchResult) => {
+        const result: dataSet = await connection.query<QueryResult>(
+          `SELECT DISTINCT(username) FROM user_profiles WHERE username LIKE CONCAT(?, "%")`,
+          [req.body.userLike]
+        );
+
+        const usernameDetails: uniqueUsername[] = result[0] as uniqueUsername[];
+
+        // uniqueUsername
+        usernameDetails.forEach((item: SearchResult) => {
           usernames.push(item.username);
         });
         return res.json(usernames);
@@ -122,13 +125,14 @@ const searchcontroller = () => {
     async getHashTags(req: Request, res: Response) {
       try {
         const hashtagNames: string[] = [];
-        const result: Array<uniqueHashtag> =
-          (await connection.query<QueryResult>(
-            `SELECT DISTINCT(name) FROM hashtags WHERE name LIKE CONCAT(?, "%")`,
-            [req.body.hashtagLike]
-          )) as unknown as Array<uniqueHashtag>;
+        const result: dataSet = await connection.query(
+          `SELECT DISTINCT(name) FROM hashtags WHERE name LIKE CONCAT(?, "%")`,
+          [req.body.hashtagLike]
+        );
+        const nameDetails: uniqueHashtag[] = result[0] as uniqueHashtag[];
 
-        result.forEach((item: { name: string }) => {
+        // uniqueHashtag
+        nameDetails.forEach((item: { name: string }) => {
           hashtagNames.push(item.name);
         });
         return res.json(hashtagNames);
@@ -139,13 +143,15 @@ const searchcontroller = () => {
     async getLocation(req: Request, res: Response) {
       try {
         const locationNames: string[] = [];
-        const result2: Array<uniqueLocation> =
-          (await connection.query<QueryResult>(
-            `SELECT DISTINCT(location) FROM posts WHERE location LIKE CONCAT(?, "%")`,
-            [req.body.locationLike]
-          )) as unknown as Array<uniqueLocation>;
+        const result2: dataSet = await connection.query<QueryResult>(
+          `SELECT DISTINCT(location) FROM posts WHERE location LIKE CONCAT(?, "%")`,
+          [req.body.locationLike]
+        );
+        const locationDetails: uniqueLocation[] =
+          result2[0] as uniqueLocation[];
 
-        result2.forEach((item: { location: string }) => {
+        // uniqueLocation
+        locationDetails.forEach((item: { location: string }) => {
           locationNames.push(item.location);
         });
         return res.json(locationNames);
@@ -154,15 +160,18 @@ const searchcontroller = () => {
       }
     },
     async onepost(req: Request, res: Response) {
-      const post_id = req.query.post_id;
-      const user_id2 = req.query.user_id;
+      const post_id: string = req.query.post_id as string;
+      const user_id2: string = req.query.user_id as string;
 
-      const count_q: Array<uniqueCount> = (await connection.query<QueryResult>(
+      const count_q: dataSet = await connection.query<QueryResult>(
         `SELECT COUNT(*) AS counter FROM posts WHERE id = ? AND user_id = ? ;`,
         [post_id, user_id2]
-      )) as unknown as Array<uniqueCount>;
+      );
+      const countDetails: uniqueCount[] = count_q[0] as uniqueCount[];
 
-      if (count_q[0].counter == 1) {
+      // uniqueCount
+
+      if (countDetails[0].counter == 1) {
         try {
           const result: Array<Post> = (await homefunc.getHome(
             req
@@ -170,7 +179,7 @@ const searchcontroller = () => {
 
           let tempobj: Post = {};
           result.forEach((e: Post, i: number) => {
-            if (e.id == post_id) {
+            if (Number(e.id) == Number(post_id)) {
               tempobj = e;
               result.splice(i, 1);
             }
@@ -187,24 +196,25 @@ const searchcontroller = () => {
       }
     },
     async getprofilepage(req: Request, res: Response) {
-      const user_id = req.query.userid;
-      const userId = (req.user as UserId).userId;
+      const user_id:string = req.query.userid as string;
+      const userId:string = (req.user as UserId).userId;
 
       if (user_id == userId) {
         res.redirect("/userProfile");
         return;
       }
 
-      const count_q: Array<uniqueCount> = (await connection.query<QueryResult>(
+      const count_q: dataSet = (await connection.query(
         `SELECT COUNT(*) AS counter FROM user_profiles WHERE user_id = ? ;`,
         [user_id]
-      )) as unknown as Array<uniqueCount>;
+      )) ;
+      const countDetails: uniqueCount[] = count_q[0] as uniqueCount[];
 
-      if (count_q[0].counter == 1) {
+      if (countDetails[0].counter == 1) {
         try {
-          const query = `SELECT * FROM user_profiles WHERE user_id = ? ;`;
+          const query :string= `SELECT * FROM user_profiles WHERE user_id = ? ;`;
 
-          const result = await connection.query(query, user_id);
+          const result:dataSet = await connection.query(query, user_id);
 
           const query_2 = `SELECT user_id, posts.id, posts.ismultiple, post_images.image, post_images.isvideo
                          FROM posts, post_images
@@ -274,20 +284,20 @@ const searchcontroller = () => {
       }
     },
     async postsearchpage(req: Request, res: Response) {
-      let search = req.body.search.trim();
+      let search:string = req.body.search.trim();
       search = search.replaceAll("'", "");
       try {
         if (search) {
           const searchhistory = `INSERT INTO search_history(user_id, search) VALUES (?, ?);`;
 
-          const history = await connection.query(searchhistory, [
+           await connection.query(searchhistory, [
             (req.user as UserId).userId,
             search,
           ]);
 
           const accounts = `SELECT user_id, username FROM user_profiles WHERE username LIKE CONCAT("%", ?, "%");`;
 
-          const result3 = await connection.query(accounts, search);
+          const result3:dataSet = await connection.query(accounts, search);
 
           const query_search = `SELECT user_id, posts.id AS post_id, 
       (SELECT pi.image FROM post_images pi WHERE pi.post_id = posts.id ORDER BY pi.id LIMIT 1) AS image,
@@ -295,26 +305,29 @@ const searchcontroller = () => {
       FROM posts 
       WHERE posts.privacy_id = 1 AND posts.isdeleted IS NULL AND location LIKE CONCAT("%", ?, "%");`;
 
-          const result2 = await connection.query(query_search, search);
+          const result2:dataSet = await connection.query(query_search, search);
 
           const tags = `SELECT DISTINCT(post_id) FROM post_hashtags 
       INNER JOIN hashtags ON post_hashtags.tag = hashtags.id WHERE name LIKE CONCAT("%", ?, "%");`;
 
-          const result4: Array<uniquePost> =
-            (await connection.query<QueryResult>(
+          const result4: dataSet =
+            (await connection.query(
               tags,
               search
-            )) as unknown as Array<uniquePost>;
+            )) ;
 
           let result;
 
-          if (result4.length != 0) {
+            const posthashtagDetails: uniquePost[] =
+          result4[0] as uniquePost[];
+
+          if (posthashtagDetails.length != 0) {
             let str = `SELECT DISTINCT(post_id), user_id, image, post_images.isvideo 
         FROM posts INNER JOIN post_images ON post_images.post_id = posts.id 
         WHERE posts.privacy_id = 1 AND posts.isdeleted IS NULL AND post_id IN (`;
 
-            for (let i = 0; i < result4.length; i++) {
-              str += result4[i].post_id + ",";
+            for (let i = 0; i < posthashtagDetails.length; i++) {
+              str += posthashtagDetails[i].post_id + ",";
             }
             str = str.slice(0, str.length - 1) + ")";
 

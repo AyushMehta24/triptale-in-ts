@@ -1,11 +1,11 @@
-import express from "express";
+import express, { Router } from "express";
 import { Request, Response } from "express";
 import postController from "../app/controllers/postController";
 import postImageUpload from "../app/middlewares/postsMiddlewares/postImageUpload";
 import updatePostProtect from "../app/middlewares/postsMiddlewares/updatePostProtect";
 import validatePostForm from "../app/middlewares/postsMiddlewares/validatePostForm";
 
-const posts = express.Router();
+const posts:Router = express.Router();
 
 posts.get("/insertform", (req: Request, res: Response) => {
   postController().getPostInsertForm(req, res);

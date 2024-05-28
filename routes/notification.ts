@@ -1,7 +1,7 @@
 import { Router } from "express";
 import notificationController from "../app/controllers/notificationController";
 
-const router = Router();
+const router:Router= Router();
 
 router.get("/", notificationController.getNotification);
 

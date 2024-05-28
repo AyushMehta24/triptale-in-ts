@@ -3,6 +3,7 @@ import logger from "../config/logger";
 import conn from "../config/mysql_connection";
 import { UserId } from "../../index";
 import { QueryOptions, QueryResult } from "mysql2";
+import { dataSet } from "../../dto/commonInterface";
 
 interface existsCheck {
   isexists: number;
@@ -20,11 +21,15 @@ const tripEventUpdateProtect = async (
     if (!req.query.eid || !/^\d+$/.test(req.query.eid.toString())) {
       return res.redirect("back");
     }
-    const result: Array<existsCheck> = (await conn.query<QueryResult>(
+    const result: dataSet = (await conn.query(
       `SELECT EXISTS(select id from trip_members where trip_id = (select trip_id from trip_events where id = ? and created_by = ? and deleted_at is null) and user_id = ? and deleted_at is null) as isexists`,
       [req.query.eid, (req.user as UserId).userId, (req.user as UserId).userId]
-    )) as unknown as Array<existsCheck>;
-    if (result[0].isexists == 1) {
+    )) ;
+
+    const resultInfo: existsCheck[] =
+    result[0] as existsCheck[];
+    // existsCheck
+    if (resultInfo[0].isexists == 1) {
       next();
     } else {
       if (req.path == "/eventdelete") {

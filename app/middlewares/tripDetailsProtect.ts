@@ -3,23 +3,24 @@ import { UserId } from "../../index";
 import logger from "../config/logger";
 import conn from "../config/mysql_connection";
 import { QueryResult } from "mysql2";
+import { dataSet } from "../../dto/commonInterface";
 const tripDetailsProtect = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const tid = req.params.tid;
-    const userId = (req.user as UserId).userId;
+    const tid:string = req.params.tid;
+    const userId:string = (req.user as UserId).userId;
 
     // Check if tid is a valid number
-    const numberRegex = /^\d+$/;
+    const numberRegex:RegExp = /^\d+$/;
     if (!numberRegex.test(tid)) {
       return res.redirect("/urlNotFound");
     }
 
     // SQL query to check if the user has access to the trip
-    const sql = `
+    const sql:string = `
       SELECT trip_details.trip_id 
       FROM trip_details 
       JOIN trip_members ON trip_details.trip_id = trip_members.trip_id
@@ -30,12 +31,15 @@ const tripDetailsProtect = async (
     `;
 
     // Execute the query
-    const [result]:Array<Array<object>> = await conn.query<QueryResult>(sql, [userId, tid]) as unknown as Array<Array<object>>;
+    const result:dataSet = await conn.query(sql, [userId, tid]) 
+
+    const resultInfo: {trip_id:string}[] =
+    result[0] as {trip_id:string}[];
 
     // If the user has access, call the next middleware
-    if (result.length > 0) {
+    if (resultInfo.length > 0) {
       next();
-    } else {
+    } else {  
       // If the user doesn't have access, redirect to an appropriate page
       return res.redirect("/displaytrip");
     }

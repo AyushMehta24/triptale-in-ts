@@ -7,6 +7,13 @@ import generateUniqueId from "generate-unique-id";
 import { QueryResult, ResultSetHeader } from "mysql2";
 import { UserId } from "../../index";
 import { StrictEventEmitter } from "socket.io/dist/typed-events";
+import {
+  UpdateSet,
+  dataSet,
+  deleteSet,
+  insertSet,
+} from "../../dto/commonInterface";
+import { InstanceRestoreOptions } from "sequelize";
 
 interface UserDetails {
   email: string;
@@ -44,6 +51,35 @@ interface SansP {
   password: string;
 }
 
+interface loginAuth {
+  user_email: string;
+  password: string;
+  islogged: number;
+  ipAddress?: string;
+}
+
+interface passSaltInterface {
+  password: string;
+  salt: string;
+}
+
+interface userDetails {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  user_bio: string;
+  user_dob: string;
+  city_id: string;
+  profile_image: string;
+  gender: string;
+}
+
+interface intrestInfo {
+  user_id: string;
+  interests: string;
+}
+
 const authController = () => {
   return {
     async getLoginForm(req: Request, res: Response) {
@@ -58,16 +94,17 @@ const authController = () => {
 
     async registerUser(req: Request, res: Response) {
       try {
-        const salt = generateUniqueId({ length: 4 });
-        const activation_key = generateUniqueId({ length: 12 });
+        const salt: string = generateUniqueId({ length: 4 });
+        const activation_key: string = generateUniqueId({ length: 12 });
 
-        let result: Array<Array<UserAuth>> = (await conn.query<QueryResult>(
+        let result: dataSet = await conn.query<QueryResult>(
           `select id,status,active_pin from users_auth where email = ?`,
           [req.body.email]
-        )) as unknown as Array<Array<UserAuth>>;
+        );
 
-        if (result[0].length >= 1) {
-          if (result[0][0].status === "inActive") {
+        const userAuthInfo = result[0] as UserAuth[];
+        if (userAuthInfo.length >= 1) {
+          if (userAuthInfo[0].status === "inActive") {
             let update = await conn.query(
               `update user_auth set created_At  = CURRENT_TIMESTAMP where eamil = ?`,
               [req.body.email]
@@ -76,7 +113,7 @@ const authController = () => {
               success: true,
               alert:
                 "you are already registred but your account is inactive click below link for activate",
-              activationLink: `https://${req.hostname}:${process.env.PORT}/activateuser?email=${req.body.email}&activationKey=${result[0][0].active_pin}`,
+              activationLink: `https://${req.hostname}:${process.env.PORT}/activateuser?email=${req.body.email}&activationKey=${userAuthInfo[0].active_pin}`,
             });
           }
           return res.send({
@@ -92,7 +129,7 @@ const authController = () => {
             status: "inActive",
             active_pin: activation_key,
           };
-          const insertinData = await conn.query<ResultSetHeader>(
+          const insertinData: insertSet = await conn.query(
             "insert into user_auth set ?",
             detail
           );
@@ -121,24 +158,26 @@ const authController = () => {
 
     async activeUser(req: Request, res: Response) {
       try {
-        let email = req.query.email;
-        let activationKey = req.query.activationKey;
-        let result: Array<Array<UserAuth>> = (await conn.query(
+        let email: string = req.query.email as string;
+        let activationKey: string = req.query.activationKey as string;
+        let result: dataSet = await conn.query(
           `select active_pin,created_at from users_auth where email = ?`,
           [email]
-        )) as unknown as Array<Array<UserAuth>>;
+        );
 
-        if (result[0].length >= 1) {
-          if (activationKey == result[0][0].active_pin) {
-            let datetime: number = new Date(
-              result[0][0]?.created_at || ""
-            ) as unknown as number;
-            let curdate: number = new Date() as unknown as number;
-            let diff = curdate - datetime;
+        const userAuthInfo = result[0] as UserAuth[];
+
+        if (userAuthInfo.length >= 1) {
+          if (activationKey == userAuthInfo[0].active_pin) {
+            let datetime: number = Number(new Date(
+              userAuthInfo[0]?.created_at || ""
+            )) ;
+            let curdate: number =Number( new Date()) ;
+            let diff: number = curdate - datetime;
             diff = diff / (1000 * 60);
 
             if (diff < 120) {
-              let active = await conn.query<ResultSetHeader>(
+              let active: UpdateSet = await conn.query(
                 `update users_auth set status = "Active" where email = ?`,
                 [email]
               );
@@ -151,7 +190,7 @@ const authController = () => {
                 return res.send("Something Went Wrong Try Again");
               }
             } else {
-              let del = await conn.query(
+              let del: deleteSet = await conn.query(
                 `delete from users_auth where email = ?`,
                 [email]
               );
@@ -171,29 +210,33 @@ const authController = () => {
 
     async loginUser(req: Request, res: Response) {
       try {
-        let result: Array<Array<LoginUserInterface>> =
-          (await conn.query<QueryResult>(
-            `select id,status,password,salt from users_auth where email = ?`,
-            [req.body.email]
-          )) as unknown as Array<Array<LoginUserInterface>>;
+        let result: dataSet = await conn.query(
+          `select id,status,password,salt from users_auth where email = ?`,
+          [req.body.email]
+        );
 
-        if (result[0].length >= 1) {
-          if (result[0][0].status === "Active") {
+        const loginiUserInfo = result[0] as LoginUserInterface[];
+
+        if (loginiUserInfo.length >= 1) {
+          if (loginiUserInfo[0].status === "Active") {
             if (
               await bcrypt.compare(
-                req.body.password.trim() + result[0][0].salt,
-                result[0][0].password
+                req.body.password.trim() + loginiUserInfo[0].salt,
+                loginiUserInfo[0].password
               )
             ) {
-              const token = jwt.sign({ userId: result[0][0].id }, "welcome");
-              const logDetails = {
+              const token: string = jwt.sign(
+                { userId: loginiUserInfo[0].id },
+                "welcome"
+              );
+              const logDetails: loginAuth = {
                 user_email: req.body.email,
                 password: await bcrypt.hash(req.body.password.trim(), 10),
                 islogged: 1,
                 ipAddress: req.socket.remoteAddress,
               };
               try {
-                let result = await conn.query(
+                let result: insertSet = await conn.query(
                   `INSERT INTO user_login_logs SET ?`,
                   logDetails
                 );
@@ -207,14 +250,14 @@ const authController = () => {
                 alert: "You are logged in Now",
               });
             } else {
-              const logDetails = {
+              const logDetails: loginAuth = {
                 user_email: req.body.email,
                 password: await bcrypt.hash(req.body.password.trim(), 10),
                 islogged: 0,
                 ipAddress: req.socket.remoteAddress,
               };
               try {
-                let result = await conn.query(
+                let result: insertSet = await conn.query(
                   `INSERT INTO user_login_logs SET ?`,
                   logDetails
                 );
@@ -255,19 +298,22 @@ const authController = () => {
 
     async getUpdatePassForm(req: Request, res: Response) {
       try {
-        const email = req.query.email;
-        const activation_key = req.query.activationKey;
-        let result: Array<Array<getUpdateInterface>> = (await conn.query(
+        const email: string = req.query.email as string;
+        const activation_key: string = req.query.activationKey as string;
+        let result: dataSet = await conn.query(
           `select active_pin,pass_updated_at from users_auth where email = ?`,
           [email]
-        )) as unknown as Array<Array<getUpdateInterface>>;
-        if (result[0].length >= 1) {
-          if (activation_key == result[0][0].active_pin) {
-            const datetime: number = new Date(
-              result[0][0].pass_updated_at
-            ) as unknown as number;
-            const curdate: number = new Date() as unknown as number;
-            let diff = curdate - datetime;
+        );
+
+        const updateInfo = result[0] as getUpdateInterface[];
+
+        if (updateInfo.length >= 1) {
+          if (activation_key == updateInfo[0].active_pin) {
+            const datetime: number = Number(
+              new Date(updateInfo[0].pass_updated_at)
+            );
+            const curdate: number = Number(new Date());
+            let diff: number = curdate - datetime;
             diff = diff / (1000 * 60);
 
             if (diff < 3) {
@@ -291,13 +337,16 @@ const authController = () => {
 
     async forgotForm(req: Request, res: Response) {
       try {
-        let result: Array<Array<UserAuth>> = (await conn.query<QueryResult>(
+        let result: dataSet = await conn.query(
           `select status,active_pin from users_auth where email = ?`,
           [req.body.email]
-        )) as unknown as Array<Array<UserAuth>>;
-        if (result[0].length >= 1) {
-          if (result[0][0].status === "Active") {
-            let update = await conn.query(
+        );
+
+        const forgotForm = result[0] as UserAuth[];
+
+        if (forgotForm.length >= 1) {
+          if (forgotForm[0].status === "Active") {
+            let update: UpdateSet = await conn.query(
               `update users_auth SET pass_updated_at = CURRENT_TIMESTAMP where email = ?`,
               [req.body.email]
             );
@@ -305,7 +354,7 @@ const authController = () => {
             return res.send({
               success: true,
               alert: "Click Below Link for Change Your account Password",
-              forgotPassLink: `http://${req.hostname}:${process.env.PORT}/changepassword?email=${req.body.email}&activationKey=${result[0][0].active_pin}`,
+              forgotPassLink: `http://${req.hostname}:${process.env.PORT}/changepassword?email=${req.body.email}&activationKey=${forgotForm[0].active_pin}`,
             });
           } else {
             return res.send({
@@ -327,24 +376,27 @@ const authController = () => {
 
     async UpdatePass(req: Request, res: Response) {
       try {
-        let result: Array<Array<UpdatePass>> = (await conn.query<QueryResult>(
+        let result: dataSet = await conn.query(
           `select pass_updated_at from users_auth where email = ?`,
           [req.body.email]
-        )) as unknown as Array<Array<UpdatePass>>;
-        const datetime: number = new Date(
-          result[0][0].pass_updated_at
-        ) as unknown as number;
-        const curdate: number = new Date() as unknown as number;
-        let diff = curdate - datetime;
+        );
+
+        const UpdatePassInfo = result[0] as UpdatePass[];
+
+        const datetime: number = Number(
+          new Date(UpdatePassInfo[0].pass_updated_at)
+        );
+        const curdate: number = Number(new Date());
+        let diff: number = curdate - datetime;
         diff = diff / (1000 * 60);
 
         if (diff < 3) {
-          const salt = generateUniqueId({ length: 4 });
-          const detail = {
+          const salt: string = generateUniqueId({ length: 4 });
+          const detail: passSaltInterface = {
             password: await bcrypt.hash(req.body.password.trim() + salt, 10),
             salt: salt,
           };
-          let update = await conn.query<ResultSetHeader>(
+          let update: UpdateSet = await conn.query<ResultSetHeader>(
             `update  users_auth SET ? where email = '${req.body.email}'`,
             detail
           );
@@ -371,7 +423,7 @@ const authController = () => {
     },
 
     async InsertProfile(req: Request, res: Response) {
-      let profile_name = "";
+      let profile_name: string = "";
       if (req.file == undefined) {
         profile_name = "/profile/avatar.png";
       } else {
@@ -380,7 +432,7 @@ const authController = () => {
         }`;
       }
 
-      let details = {
+      let details: userDetails = {
         user_id: (req.user as UserId).userId,
         first_name: req.body.first_name.trim(),
         last_name: req.body.last_name.trim(),
@@ -393,15 +445,15 @@ const authController = () => {
       };
 
       try {
-        let [result] = await conn.query(
+        let result: insertSet = await conn.query(
           `INSERT INTO user_profiles SET ?;`,
           details
         );
-        let insert: ResultSetHeader = result as ResultSetHeader;
+        let insert: insertSet = result;
         let interests = req.body.userInterests || [];
 
         interests?.map(async (item: string) => {
-          let object = {
+          let object:intrestInfo = {
             user_id: (req.user as UserId).userId,
             interests: item,
           };
@@ -411,7 +463,7 @@ const authController = () => {
           );
         });
 
-        if (!insert.insertId) {
+        if (!insert[0].insertId) {
           return res.redirect("/home");
         }
       } catch (err) {
@@ -421,7 +473,7 @@ const authController = () => {
     },
 
     async UpdateProfile(req: Request, res: Response) {
-      let profile_name = "";
+      let profile_name:string = "";
       if (req.file == undefined) {
         profile_name = req.body.filename;
       } else {
@@ -430,7 +482,7 @@ const authController = () => {
         }`;
       }
       try {
-        let update = await conn.query(
+        let update:UpdateSet = await conn.query(
           `UPDATE user_profiles SET first_name = ?,last_name = ?,user_bio =?,user_dob = ?,city_id =?,profile_image =?,gender=? WHERE user_id = ?`,
           [
             req.body.first_name.trim(),
@@ -457,7 +509,7 @@ const authController = () => {
 
     async GetProfile(req: Request, res: Response) {
       try {
-        let getProfile = await conn.query<QueryResult>(
+        let getProfile:dataSet = await conn.query(
           `SELECT * FROM user_profiles join users_auth on user_profiles.user_id=users_auth.id  where user_profiles.user_id=?;`,
           [(req.user as UserId).userId]
         );
@@ -482,22 +534,25 @@ const authController = () => {
 
     async resetPassword(req: Request, res: Response) {
       try {
-        let result: Array<Array<SansP>> = (await conn.query(
+        let result:dataSet = (await conn.query(
           `select salt,password from users_auth where id = ?`,
           [(req.user as UserId).userId]
-        )) as unknown as Array<Array<SansP>>;
+        )) 
+
+        const sanspResult = result[0] as SansP[];
+
         if (
           await bcrypt.compare(
-            req.body.CurrentPassword.trim() + result[0][0].salt,
-            result[0][0].password
+            req.body.CurrentPassword.trim() + sanspResult[0].salt,
+            sanspResult[0].password
           )
         ) {
-          const salt = generateUniqueId({ length: 4 });
+          const salt:string = generateUniqueId({ length: 4 });
           const detail = {
             password: await bcrypt.hash(req.body.password.trim() + salt, 10),
             salt: salt,
           };
-          let update = await conn.query<ResultSetHeader>(
+          let update:UpdateSet = await conn.query<ResultSetHeader>(
             `update  users_auth SET ? where id = '${
               (req.user as UserId).userId
             }'`,

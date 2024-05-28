@@ -1,4 +1,4 @@
-import multer, { StorageEngine } from "multer";
+import multer, { Multer, StorageEngine } from "multer";
 import fs from "fs";
 import path from "path";
 import { Request, Response, NextFunction } from "express";
@@ -9,8 +9,8 @@ import { UserId } from "../../../index";
 const storage: StorageEngine = multer.diskStorage({
   destination: (req: Request, file, cb) => {
     try {
-      const coverfolder = (req.user as UserId).userId;
-      const uploadDir = path.join("images", "posts", coverfolder.toString());
+      const coverfolder:string = (req.user as UserId).userId;
+      const uploadDir:string = path.join("images", "posts", coverfolder.toString());
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
@@ -26,7 +26,7 @@ const storage: StorageEngine = multer.diskStorage({
 });
 
 // Create the multer upload middleware
-const upload = multer({ storage: storage });
+const upload:Multer = multer({ storage: storage });
 
 // Define the postImageUpload middleware function
 const postImageUpload = (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +40,7 @@ const postImageUpload = (req: Request, res: Response, next: NextFunction) => {
       const errors: string[] = [];
 
       files.forEach((file) => {
-        const allowedTypes = [
+        const allowedTypes:string[] = [
           "image/jpeg",
           "image/png",
           "image/jpg",
@@ -48,7 +48,7 @@ const postImageUpload = (req: Request, res: Response, next: NextFunction) => {
           "video/mp4",
           "video/webm",
         ];
-        const maxSize = 20 * 1024 * 1024; // 20MB
+        const maxSize:number = 20 * 1024 * 1024; // 20MB
 
         if (!allowedTypes.includes(file.mimetype)) {
           errors.push(`Invalid file type: ${file.originalname}`);

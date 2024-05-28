@@ -24,38 +24,38 @@
                     -webkit-box-orient: vertical;
                   "
                 >
-                  <%=data[0].mainTitle%>
+                  <%=tripDetailInfo[0].mainTitle%>
                 </h3>
                 <br />
                 <span
                   class="text-sm font-bold tracking-wider capitalize text-gray-400 block w-[200px]"
                 >
-                  <%=data[0].mainDiscription%>
+                  <%=tripDetailInfo[0].mainDiscription%>
                 </span>
               </div>
               <div class="flex flex-col">
-                <a href="/displayTrip/chat/<%=data[0].trip_id%>">
+                <a href="/displayTrip/chat/<%=tripDetailInfo[0].trip_id%>">
                   <button
                     class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
                   >
                     Message
                   </button>
                 </a>
-                <a href="/trips/insertdays/<%=data[0].trip_id%>">
+                <a href="/trips/insertdays/<%=tripDetailInfo[0].trip_id%>">
                   <button
                     class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
                   >
                     Add Days
                   </button>
                 </a>
-                <a href="/trips/editmembers/<%=data[0].trip_id%>">
+                <a href="/trips/editmembers/<%=tripDetailInfo[0].trip_id%>">
                   <button
                     class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
                   >
                     Edit Members
                   </button>
                 </a>
-                <a href="/trips/eventcreate/<%=data[0].trip_id%>">
+                <a href="/trips/eventcreate/<%=tripDetailInfo[0].trip_id%>">
                   <button
                     class="text-white w-48 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600"
                   >
@@ -75,14 +75,14 @@
               <div
                 class="col-span-12 space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:bg-gray-700"
               >
-                <%for(let i=0 ; i < data.length ; i++) {%>
+                <%for(let i=0 ; i < tripDetailInfo.length ; i++) {%>
 
                 <div
                   id="<%=i%>"
                   class="flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] before:bg-violet-400"
                 >
                   <h3 class="text-xl font-semibold tracking-wide capitalize">
-                    <%=data[i].title%>
+                    <%=tripDetailInfo[i].title%>
                   </h3>
                   <img
                     id="dot[<%=i%>]"
@@ -99,43 +99,43 @@
                     class="hidden w-[125px] absolute text-center top-[40px] right-[-20px] z-1 shadow-xl border bg-white"
                   >
                     <a
-                      href="/trips/updateday?tid=<%=data[i].trip_id%>&did=<%=data[i].id%>"
+                      href="/trips/updateday?tid=<%=tripDetailInfo[i].trip_id%>&did=<%=tripDetailInfo[i].id%>"
                       class="cursor-pointer"
                       >Update Day</a
                     >
                     <p
                       id="deleteTrip[<%=i%>]"
-                      onclick="deleteDay('<%=i%>' ,'<%=data[i].id%>' )"
+                      onclick="deleteDay('<%=i%>' ,'<%=tripDetailInfo[i].id%>' )"
                       class="cursor-pointer"
                     >
                       Delete Day
                     </p>
                   </div>
                   <time class="text-xs tracking-wide uppercase text-gray-400">
-                    <%=data[i].dates.getDate() %>-<%= data[i].dates.getMonth()+1
-                    %>-<%= data[i].dates.getFullYear() %>
+                    <%=tripDetailInfo[i].dates.getDate() %>-<%= tripDetailInfo[i].dates.getMonth()+1
+                    %>-<%= tripDetailInfo[i].dates.getFullYear() %>
                   </time>
                   <p
                     class="text-xs tracking-wide capitalize dark:text-gray-600"
                   >
-                    <%=data[i].location%>
+                    <%=tripDetailInfo[i].location%>
                   </p>
-                  <p class="mt-3 w-[450px]"><%=data[i].discription%></p>
+                  <p class="mt-3 w-[450px]"><%=tripDetailInfo[i].discription%></p>
                   <a
                     class="w-[300px]"
-                    href="/displayTrip/images/<%=data[i].trip_id%>/<%=data[i].id%>"
+                    href="/displayTrip/images/<%=tripDetailInfo[i].trip_id%>/<%=tripDetailInfo[i].id%>"
                   >
-                    <%if(data[i].image.includes("mp4") ||
-                    data[i].image.includes("webm")){%>
+                    <%if(tripDetailInfo[i].image.includes("mp4") ||
+                    tripDetailInfo[i].image.includes("webm")){%>
                     <video
                       class="h-[200px] w-[300px] mt-[15px] rounded-lg object-cover"
                     >
                       <source
-                        src="/trips/tripImages/<%=data[i].image%>"
+                        src="/trips/tripImages/<%=tripDetailInfo[i].image%>"
                         type="video/mp4"
                       />
                     </video>
-                    <%}else{%> <%if(data[i].image === "AddImage.png"){ %>
+                    <%}else{%> <%if(tripDetailInfo[i].image === "AddImage.png"){ %>
                     <img
                       class="h-[200px] w-[300px] mt-[15px] rounded-lg object-cover"
                       src="/assets/images/AddImage.png"
@@ -144,7 +144,7 @@
                     <%}else{ %>
                     <img
                       class="h-[200px] w-[300px] mt-[15px] rounded-lg object-cover"
-                      src="/trips/tripImages/<%=data[i].image%>"
+                      src="/trips/tripImages/<%=tripDetailInfo[i].image%>"
                       alt=""
                     />
                     <%}%> <%}%>

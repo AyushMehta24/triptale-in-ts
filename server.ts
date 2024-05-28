@@ -5,10 +5,21 @@ import web from "./routes/web";
 import expressLayouts from "express-ejs-layouts";
 import cookieParser from "cookie-parser";
 import passport from "passport";
+import cors from "cors"
+
+
 
 dotenv.config();
 
 const app: Application = express();
+
+const corsOptions = { 
+  // origin:'https://abc.onrender.com',
+  AccessControlAllowOrigin: '*',  
+  origin: '*',  
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' 
+}
+app.use(cors(corsOptions))
 const server = app.listen(process.env.PORT || 3002 , ()=>{
   console.log(`sercver is running on port ${process.env.PORT || 3002}`);
 });

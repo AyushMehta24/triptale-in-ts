@@ -19,6 +19,7 @@ export interface multiPostItem {
   create_at: string;
   isvideo: string;
   post_id: string;
+  comment_by?:string
 }
 
 export interface notificationType {
@@ -45,4 +46,5 @@ export interface postimages {
   last_name: string;
   username: string;
   bio: string;
+  comment_by?:string
 }

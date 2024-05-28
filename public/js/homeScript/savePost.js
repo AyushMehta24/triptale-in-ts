@@ -3,7 +3,6 @@ let saveFlag;
 saveIcon.forEach((ele) => {
   ele.addEventListener("click", async () => {
     const postId = ele.parentElement.firstElementChild.id;
-    console.log(ele.parentElement.firstElementChild.id);
 
     if (ele.src == window.location.origin + "/assets/images/save-icon.png") {
       ele.src = "/assets/images/save-fill-icon.png";

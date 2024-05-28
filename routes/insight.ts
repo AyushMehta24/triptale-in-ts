@@ -2,7 +2,7 @@ import { Router } from "express";
 import insightController from "../app/controllers/insightController";
 import triInsight from "../app/middlewares/tripInsight";
 
-const router = Router();
+const router:Router = Router();
 
 // const controller = insightController();
 
